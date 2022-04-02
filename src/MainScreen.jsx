@@ -38,7 +38,7 @@ const useWindowEventListener = (event, listener) => {
 	}, [event, listener]);
 };
 
-const Branch = ({branch: {y, flipX, state}, onClickStart, onClickMove, onClickRelease}) => {
+const Branch = ({branch: {y, flipX, state}, onClick}) => {
 	const width = [350, 250, 150, 50][state];
 	const [isPointerDown, setIsPointerDown] = React.useState(false)
 	const [position, setPosition] = React.useState();
@@ -49,23 +49,8 @@ const Branch = ({branch: {y, flipX, state}, onClickStart, onClickMove, onClickRe
 			originalEvent = originalEvent.changedTouches[0];
 		}
 		setPosition({x: originalEvent.clientX, y: originalEvent.clientY})
-		onClickStart();
+		onClick();
 	};
-	useWindowEventListener("pointermove", event => {
-		if (isPointerDown) {
-			if (position) {
-				onClickMove({dx: event.clientX - position.x, dy: event.clientY - position.y});
-			}
-			setPosition({x: event.clientX, y: event.clientY})
-		}
-	});
-	useWindowEventListener("pointerup", () => {
-		if (isPointerDown) {
-			setIsPointerDown(false);
-			setPosition()
-			onClickRelease();
-		}
-	});
 
 	return (
 		<Rectangle
@@ -100,6 +85,8 @@ const takeOffSpeed = -0.02; // Influence of one bird leaving
 const limitAngle = 20; // Max angle before the game is lost
 const endAcceleration = 0.015; // Acceleration when we reach the limit angle
 const movingStrength = 0.02; // By how much the tree moves when we drag it
+const inertiaStrength = 0.2; // By how much the tree moves when we release it
+const releaseTimeout = 1000; // How long we can hold a branch
 
 const Tree = ({gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
@@ -126,7 +113,7 @@ const Tree = ({gameOver}) => {
 		// {id: 4, x: -100, y: -1000},
 		// {id: 5, x: -100, y: -900},
 	]);
-	const [isHoldingBranch, setIsHoldingBranch] = React.useState(false);
+	const [isHoldingBranch, setIsHoldingBranch] = React.useState(null);
 
 	React.useEffect(() => {
 		addBird(findPosition(branches), false);
@@ -199,29 +186,41 @@ const Tree = ({gameOver}) => {
 	};
 
 	const holdBranch = id => () => {
-		setIsHoldingBranch(true);
+		setIsHoldingBranch({id});
 		setSpeedRaw(0);
-		setTimeout(releaseBranch(id), 500);
+		setTimeout(() => releaseBranch(id), releaseTimeout);
 	};
 
-	const moveBranch = id => ({dx}) => {
-		if (isHoldingBranch) {
-			setAngle(angle => angle + dx * movingStrength);
-		}
+	const moveBranch = (id, dx) => {
+		setAngle(angle => angle + dx * movingStrength);
 	};
 
-	const releaseBranch = (id) => () => {
+	const releaseBranch = (id) => {
 		setIsHoldingBranch(isHoldingBranch => {
-			if (isHoldingBranch) {
-				setTimeout(() => {
-					setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: branch.state + 1} : branch))
-				});
+			if (!isHoldingBranch) {
+				return;
 			}
-			return false;
-		});
-		const speed = getSpeed().vx * movingStrength * 10;
-		setSpeed(speed);
+			setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: branch.state + 1} : branch))
+			const speed = getSpeed().vx * Math.abs(getSpeed().vx) * inertiaStrength;
+			setSpeedRaw(speed);
+			return null;
+		})
 	}
+
+	useWindowEventListener("pointermove", event => {
+		if (isHoldingBranch) {
+			moveBranch(isHoldingBranch.id, event.movementX)
+			// if (position) {
+			// 	onClickMove({dx: event.clientX - position.x, dy: event.clientY - position.y});
+			// }
+			// setPosition({x: event.clientX, y: event.clientY})
+		}
+	});
+	useWindowEventListener("pointerup", () => {
+		if (isHoldingBranch) {
+			releaseBranch(isHoldingBranch.id);
+		}
+	});
 
 	return (
 		<Container angle={angle} x={360} y={1280}>
@@ -230,9 +229,7 @@ const Tree = ({gameOver}) => {
 				<Branch
 					key={id}
 					branch={branch}
-					onClickStart={holdBranch(id)}
-					onClickMove={moveBranch(id)}
-					onClickRelease={releaseBranch(id)}
+					onClick={holdBranch(id)}
 				/>
 			))}
 			{birds.map(({id, ...bird}) => <Bird key={id} bird={bird} onClick={flipBird(id)}/>)}

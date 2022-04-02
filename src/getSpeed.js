@@ -1,5 +1,5 @@
 let lastPositions = [];
-const size = 4;
+const size = 5;
 
 window.addEventListener("mousemove", event => {
 	lastPositions.push({x: event.clientX, y: event.clientY, t: Date.now()});
