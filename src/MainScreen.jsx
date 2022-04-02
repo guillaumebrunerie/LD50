@@ -94,10 +94,11 @@ const findPosition = (branches, sign = 0) => {
 
 const aFactor = 1e-5;  // Influence of one degree
 const bFactor = 4e-5; // Influence of one bird
-const landingSpeed = 0.03; // Influence of one bird landing
-const takeOffSpeed = -0.01; // Influence of one bird leaving
+const landingSpeed = 0.05; // Influence of one bird landing
+const takeOffSpeed = -0.02; // Influence of one bird leaving
 const limitAngle = 20; // Max angle before the game is lost
 const endAcceleration = 0.015; // Acceleration when we reach the limit angle
+const movingStrength = 0.02; // By how much the tree moves when we drag it
 
 const Tree = ({gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
@@ -197,25 +198,19 @@ const Tree = ({gameOver}) => {
 	};
 
 	const holdBranch = id => () => {
-		console.log("HOLD", id);
 		setIsHoldingBranch(true);
 		setSpeedRaw(0);
 		setTimeout(releaseBranch(id), 500);
 	};
 
 	const moveBranch = id => ({dx}) => {
-		console.log("MOVE", id, isHoldingBranch);
 		if (isHoldingBranch) {
-			if (isNaN(dx)) {
-				debugger;
-			}
-			setAngle(angle => angle + dx * 0.01);
+			setAngle(angle => angle + dx * movingStrength);
 		}
 	};
 
 	const releaseBranch = (id) => () => {
 		setIsHoldingBranch(isHoldingBranch => {
-			console.log("RELEASE", id, isHoldingBranch);
 			if (isHoldingBranch) {
 				setTimeout(() => {
 					setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: branch.state + 1} : branch))
