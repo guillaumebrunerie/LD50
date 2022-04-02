@@ -5,8 +5,8 @@ import {Stage} from "react-pixi-fiber/index.js";
 import {Loader} from "./Loader";
 import App from "./App";
 
-const width = 1280
-const height = 720;
+const width = 720;
+const height = 1280;
 
 ReactDOM.render(
 	<Stage options={{backgroundColor: 0x10bb99, height, width}}>
