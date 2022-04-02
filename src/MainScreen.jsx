@@ -34,7 +34,7 @@ const useWindowEventListener = (event, listener) => {
 	React.useEffect(() => {
 		window.addEventListener(event, listener);
 		return () => window.removeEventListener(event, listener);
-	});
+	}, [event, listener]);
 };
 
 const Branch = ({branch: {y, flipX, state}, onClickStart, onClickMove, onClickRelease}) => {
@@ -43,7 +43,11 @@ const Branch = ({branch: {y, flipX, state}, onClickStart, onClickMove, onClickRe
 	const [position, setPosition] = React.useState();
 	const pointerdown = event => {
 		setIsPointerDown(true);
-		setPosition({x: event.data.originalEvent.clientX, y: event.data.originalEvent.clientY})
+		let originalEvent = event.data.originalEvent;
+		if (originalEvent instanceof TouchEvent) {
+			originalEvent = originalEvent.changedTouches[0];
+		}
+		setPosition({x: originalEvent.clientX, y: originalEvent.clientY})
 		onClickStart();
 	};
 	useWindowEventListener("pointermove", event => {
@@ -193,12 +197,14 @@ const Tree = ({gameOver}) => {
 	};
 
 	const holdBranch = id => () => {
+		console.log("HOLD", id);
 		setIsHoldingBranch(true);
 		setSpeedRaw(0);
-		setTimeout(() => setIsHoldingBranch(false), 500);
+		setTimeout(releaseBranch(id), 500);
 	};
 
-	const moveBranch = id => ({dx, dy}) => {
+	const moveBranch = id => ({dx}) => {
+		console.log("MOVE", id, isHoldingBranch);
 		if (isHoldingBranch) {
 			if (isNaN(dx)) {
 				debugger;
@@ -207,10 +213,16 @@ const Tree = ({gameOver}) => {
 		}
 	};
 
-	const releaseBranch = id => () => {
-		console.log(id);
-		setIsHoldingBranch(false);
-		setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: branch.state + 1} : branch));
+	const releaseBranch = (id) => () => {
+		setIsHoldingBranch(isHoldingBranch => {
+			console.log("RELEASE", id, isHoldingBranch);
+			if (isHoldingBranch) {
+				setTimeout(() => {
+					setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: branch.state + 1} : branch))
+				});
+			}
+			return false;
+		});
 	}
 
 	return (
