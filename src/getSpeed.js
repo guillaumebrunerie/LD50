@@ -14,6 +14,9 @@ window.addEventListener("touchmove", event => {
 const getSpeed = () => {
 	const first = lastPositions[0];
 	const last = lastPositions[lastPositions.length - 1];
+	if (!first) {
+		return {vx: 0, vy: 0};
+	}
 	const dx = last.x - first.x;
 	const dy = last.y - first.y;
 	const dt = last.t - first.t;

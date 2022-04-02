@@ -113,7 +113,7 @@ const Tree = ({gameOver}) => {
 		// {id: 4, x: -100, y: -1000},
 		// {id: 5, x: -100, y: -900},
 	]);
-	const [isHoldingBranch, setIsHoldingBranch] = React.useState(null);
+	const isHoldingBranch = React.useRef();
 
 	React.useEffect(() => {
 		addBird(findPosition(branches), false);
@@ -137,7 +137,7 @@ const Tree = ({gameOver}) => {
 			gameOver();
 			return;
 		}
-		if (isHoldingBranch) {
+		if (isHoldingBranch.current) {
 			return;
 		}
 
@@ -153,7 +153,7 @@ const Tree = ({gameOver}) => {
 			a += angle > 0 ? endAcceleration : -endAcceleration;
 		}
 		setSpeedRaw(speed => speed + a);
-		setAngle(angle => isHoldingBranch ? angle : angle + delta * speed);
+		setAngle(angle => isHoldingBranch.current ? angle : angle + delta * speed);
 	});
 
 	// Birds arriving
@@ -185,10 +185,11 @@ const Tree = ({gameOver}) => {
 		setSpeed(speed => previousX > 0 ? speed - landingSpeed : speed + landingSpeed);
 	};
 
+	const timeoutRef = React.useRef();
 	const holdBranch = id => () => {
-		setIsHoldingBranch({id});
+		isHoldingBranch.current = {id};
 		setSpeedRaw(0);
-		setTimeout(() => releaseBranch(id), releaseTimeout);
+		timeoutRef.current = setTimeout(() => releaseBranch(id), releaseTimeout);
 	};
 
 	const moveBranch = (id, dx) => {
@@ -196,20 +197,16 @@ const Tree = ({gameOver}) => {
 	};
 
 	const releaseBranch = (id) => {
-		setIsHoldingBranch(isHoldingBranch => {
-			if (!isHoldingBranch) {
-				return;
-			}
-			setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: branch.state + 1} : branch))
-			const speed = getSpeed().vx * movingStrength * 10;
-			setSpeedRaw(speed);
-			return null;
-		})
+		clearTimeout(timeoutRef.current);
+		isHoldingBranch.current = null;
+		setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: Math.min(branch.state + 1, 3)} : branch))
+		const speed = getSpeed().vx * movingStrength * 10;
+		setSpeedRaw(speed);
 	}
 
 	useWindowEventListener("pointermove", event => {
-		if (isHoldingBranch) {
-			moveBranch(isHoldingBranch.id, event.movementX)
+		if (isHoldingBranch.current) {
+			moveBranch(isHoldingBranch.current.id, event.movementX);
 			// if (position) {
 			// 	onClickMove({dx: event.clientX - position.x, dy: event.clientY - position.y});
 			// }
@@ -217,8 +214,8 @@ const Tree = ({gameOver}) => {
 		}
 	});
 	useWindowEventListener("pointerup", () => {
-		if (isHoldingBranch) {
-			releaseBranch(isHoldingBranch.id);
+		if (isHoldingBranch.current) {
+			releaseBranch(isHoldingBranch.current.id);
 		}
 	});
 
