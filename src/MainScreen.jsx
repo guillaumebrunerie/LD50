@@ -1,15 +1,37 @@
 import * as React from "react";
 import Rectangle from "./components/Rectangle";
 import Circle from "./components/Circle";
-import {Container, Text} from "react-pixi-fiber/index.js";
+import {Sprite, Container, Text} from "react-pixi-fiber/index.js";
 import {usePixiTicker} from "react-pixi-fiber/index.js";
 import getSpeed from "./getSpeed";
+import {Textures} from "./Loader";
+
+const treeEndState = 1;
+
+const trunkY = 35;
+const treeY = -35;
+const backgroundY = -830;
+const endY = [null, 12, 6, 2];
+
+const TrunkFloor = () => {
+	const endTexture = Textures.Tree.get("TreeEnd_0" + treeEndState);
+	return (
+		<>
+			<Sprite texture={Textures.Tree.get("Trunk")} anchor={[0.5, 0]} y={trunkY}/>
+			<Sprite texture={endTexture} anchor={[0.5, 1]} y={0} scale={[1, -1]} y={-endY[treeEndState]}/>
+		</>
+	);
+}
 
 const Trunk = () => {
+	const endTexture = Textures.Tree.get("TreeEnd_0" + treeEndState);
+
 	return (
 		<>
 			<Circle x={0} y={-900} radius={700} fill={0x00AA00}/>
-			<Rectangle x={-30} y={-1500} width={60} height={1500} fill={0x005500}/>
+			<Sprite texture={Textures.Tree.get("TreeBack")} anchor={0.5} y={backgroundY}/>
+			<Sprite texture={Textures.Tree.get("Tree")} anchor={[0.5, 1]} y={treeY}/>
+			<Sprite texture={endTexture} anchor={[0.5, 1]} y={0} y={endY[treeEndState]}/>
 		</>
 	)
 }
@@ -40,17 +62,6 @@ const useWindowEventListener = (event, listener) => {
 
 const Branch = ({branch: {y, flipX, state}, onClick}) => {
 	const width = [350, 250, 150, 50][state];
-	const [isPointerDown, setIsPointerDown] = React.useState(false)
-	const [position, setPosition] = React.useState();
-	const pointerdown = event => {
-		setIsPointerDown(true);
-		let originalEvent = event.data.originalEvent;
-		if (originalEvent instanceof TouchEvent) {
-			originalEvent = originalEvent.changedTouches[0];
-		}
-		setPosition({x: originalEvent.clientX, y: originalEvent.clientY})
-		onClick();
-	};
 
 	return (
 		<Rectangle
@@ -61,7 +72,7 @@ const Branch = ({branch: {y, flipX, state}, onClick}) => {
 			fill={0x005500}
 			interactive
 			buttonMode
-			pointerdown={pointerdown}
+			pointerdown={onClick}
 		/>
 	)
 };
@@ -85,10 +96,10 @@ const takeOffSpeed = -0.02; // Influence of one bird leaving
 const limitAngle = 20; // Max angle before the game is lost
 const endAcceleration = 0.015; // Acceleration when we reach the limit angle
 const movingStrength = 0.02; // By how much the tree moves when we drag it
-const inertiaStrength = 0.2; // By how much the tree moves when we release it
-const releaseTimeout = 1000; // How long we can hold a branch
+const inertiaStrength = movingStrength * 10; // By how much the tree moves when we release it
+const releaseTimeout = 500; // How long we can hold a branch
 
-const Tree = ({gameOver}) => {
+const Tree = ({x, y, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
 	const [speed, setSpeedRaw] = React.useState(0);
 	const setSpeed = setter => {
@@ -106,13 +117,7 @@ const Tree = ({gameOver}) => {
 		{id: 6, y: 1150, flipX: true, state: 0},
 	]);
 
-	const [birds, setBirds] = React.useState([
-		// {id: 1, x: -100, y: -1100},
-		// {id: 2, x: -100, y: -1200},
-		// {id: 3, x: -100, y: -800},
-		// {id: 4, x: -100, y: -1000},
-		// {id: 5, x: -100, y: -900},
-	]);
+	const [birds, setBirds] = React.useState([]);
 	const isHoldingBranch = React.useRef();
 
 	React.useEffect(() => {
@@ -200,17 +205,13 @@ const Tree = ({gameOver}) => {
 		clearTimeout(timeoutRef.current);
 		isHoldingBranch.current = null;
 		setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: Math.min(branch.state + 1, 3)} : branch))
-		const speed = getSpeed().vx * movingStrength * 10;
+		const speed = getSpeed().vx * inertiaStrength;
 		setSpeedRaw(speed);
 	}
 
 	useWindowEventListener("pointermove", event => {
 		if (isHoldingBranch.current) {
 			moveBranch(isHoldingBranch.current.id, event.movementX);
-			// if (position) {
-			// 	onClickMove({dx: event.clientX - position.x, dy: event.clientY - position.y});
-			// }
-			// setPosition({x: event.clientX, y: event.clientY})
 		}
 	});
 	useWindowEventListener("pointerup", () => {
@@ -220,17 +221,22 @@ const Tree = ({gameOver}) => {
 	});
 
 	return (
-		<Container angle={angle} x={360} y={1280}>
-			<Trunk/>
-			{branches.map(({id, ...branch}) => (
-				<Branch
-					key={id}
-					branch={branch}
-					onClick={holdBranch(id)}
-				/>
-			))}
-			{birds.map(({id, ...bird}) => <Bird key={id} bird={bird} onClick={flipBird(id)}/>)}
-		</Container>
+		<>
+			<Container x={x} y={y}>
+				<TrunkFloor/>
+			</Container>
+			<Container angle={angle} x={x} y={y}>
+				<Trunk/>
+				{branches.map(({id, ...branch}) => (
+					<Branch
+						key={id}
+						branch={branch}
+						onClick={holdBranch(id)}
+					/>
+				))}
+				{birds.map(({id, ...bird}) => <Bird key={id} bird={bird} onClick={flipBird(id)}/>)}
+			</Container>
+		</>
 	);
 };
 
@@ -249,7 +255,7 @@ const StartButton = ({onClick}) => {
 			<Text x={350} y={875} anchor={0.5} text="START"/>
 		</Rectangle>
 	);
-}
+};
 
 const MainScreen = () => {
 	const [isGameOver, setIsGameOver] = React.useState(false);
@@ -278,12 +284,12 @@ const MainScreen = () => {
 
 	return (
 		<Container>
-			<Tree key={attempt} gameOver={gameOver}/>
+			<Tree key={attempt} gameOver={gameOver} x={360} y={1280 - 115}/>
 			{isGameOver && <Text x={10} y={10} text={"Game over"}/>}
 			{isGameOver && lastScore > 0 && <Text x={10} y={40} text={`You lasted ${lastScore} seconds\nHigh score: ${highScore} seconds`}/>}
 			{isGameOver && <StartButton onClick={newGame}/>}
 		</Container>
 	);
-}
+};
 
 export default MainScreen;

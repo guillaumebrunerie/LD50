@@ -24,7 +24,7 @@ const loadTextures = (callback) => {
 	const loader = PIXI.Loader.shared;
 
 	Object.entries(TextureData).forEach(([key, value]) => {
-		loader.add(key, "./dist/" + (typeof value === "string" ? value : value.file), OPTIONS);
+		loader.add(key, "./dist/" + (typeof value === "string" ? value : value.file));
 	});
 
 	loader.load((_, resources) => {

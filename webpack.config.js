@@ -39,11 +39,11 @@ module.exports = {
 		static: "./dist",
 	},
 	plugins: [
-		// new CopyPlugin({
-		// 	patterns: [
-		// 		{ from: "gfx", to: "dist" },
-		// 	],
-		// }),
+		new CopyPlugin({
+			patterns: [
+				{ from: "gfx", to: "dist" },
+			],
+		}),
 		...isDevelopment ? [new ReactRefreshWebpackPlugin()] : []
 	],
 };
