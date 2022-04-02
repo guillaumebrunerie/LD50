@@ -73,24 +73,41 @@ const branchDeltaY2 = {
 };
 
 const Branch = ({branch: {y, flipX, state, type}, onClick}) => {
-	const width = [350, 250, 150, 50][state];
 	const texture1 = Textures.Tree.get(`Branch_${type}_01`);
 	const texture2 = Textures.Tree.get(`Branch_${type}_02`);
+	const angle2 = state == 1 ? 30 : 0;
+	const angle1 = state == 3 ? 30 : 0;
 
 	return (
 		<Container scale={[flipX ? -1 : 1, 1]}>
-			<Rectangle
-				x={branchDeltaX}
-				y={-y - 30}
-				width={width}
-				height={60}
-				alpha={0.001}
-				interactive
-				buttonMode
-				pointerdown={onClick}
-			/>
-			<Sprite texture={texture1} anchor={[0, 0.5]} y={-y} x={branchDeltaX}/>
-			<Sprite texture={texture2} anchor={[0, 0.5]} y={-y + branchDeltaY2[type]} x={branchDeltaX2[type]}/>
+			{state <= 3 && (
+				<Container x={branchDeltaX} y={-y} angle={angle1}>
+					<Rectangle
+						y={-30}
+						width={170}
+						height={60}
+						alpha={0.001}
+						interactive
+						buttonMode
+						pointerdown={onClick}
+					/>
+				</Container>
+			)}
+			{state <= 1 && (
+				<Container x={branchDeltaX + 160} y={-y} angle={angle2}>
+					<Rectangle
+						y={-30}
+						width={170}
+						height={60}
+						alpha={0.001}
+						interactive
+						buttonMode
+						pointerdown={onClick}
+					/>
+				</Container>
+			)}
+			{state <= 3 && <Sprite texture={texture1} anchor={[0, 0.5]} y={-y} x={branchDeltaX} angle={angle1}/>}
+			{state <= 1 && <Sprite texture={texture2} anchor={[0, 0.5]} y={-y + branchDeltaY2[type]} x={branchDeltaX2[type]} angle={angle2}/>}
 		</Container>
 	)
 };
@@ -224,7 +241,7 @@ const Tree = ({x, y, gameOver}) => {
 	const releaseBranch = (id) => {
 		clearTimeout(timeoutRef.current);
 		isHoldingBranch.current = null;
-		setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: Math.min(branch.state + 1, 3)} : branch))
+		setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: Math.min(branch.state + 1, 4)} : branch))
 		const speed = getSpeed().vx * inertiaStrength;
 		setSpeedRaw(speed);
 	}
