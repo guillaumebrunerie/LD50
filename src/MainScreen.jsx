@@ -36,9 +36,9 @@ const Trunk = () => {
 	)
 }
 
-const Bird = ({bird: {x, y}, onClick, ...props}) => {
+const Bird = ({bird: {x, y, size, color}, onClick, ...props}) => {
 	return (
-		<Circle x={x} y={-y} radius={30} fill={0xFF0000} interactive buttonMode pointerdown={onClick} {...props}/>
+		<Sprite texture={Textures.Birds.get(`Bird_${size}_0${color}`)} anchor={0.5} x={x} y={-y} interactive buttonMode pointerdown={onClick}/>
 	)
 }
 
@@ -60,20 +60,38 @@ const useWindowEventListener = (event, listener) => {
 	}, [event, listener]);
 };
 
-const Branch = ({branch: {y, flipX, state}, onClick}) => {
+const branchDeltaX = 36;
+const branchDeltaX2 = {
+	"A": 180,
+	"B": 170,
+	"C": 160,
+}
+const branchDeltaY2 = {
+	"A": -11,
+	"B": 3,
+	"C": -6,
+};
+
+const Branch = ({branch: {y, flipX, state, type}, onClick}) => {
 	const width = [350, 250, 150, 50][state];
+	const texture1 = Textures.Tree.get(`Branch_${type}_01`);
+	const texture2 = Textures.Tree.get(`Branch_${type}_02`);
 
 	return (
-		<Rectangle
-			x={flipX ? -width : 0}
-			y={-y}
-			width={width}
-			height={60}
-			fill={0x005500}
-			interactive
-			buttonMode
-			pointerdown={onClick}
-		/>
+		<Container scale={[flipX ? -1 : 1, 1]}>
+			<Rectangle
+				x={branchDeltaX}
+				y={-y - 30}
+				width={width}
+				height={60}
+				alpha={0.001}
+				interactive
+				buttonMode
+				pointerdown={onClick}
+			/>
+			<Sprite texture={texture1} anchor={[0, 0.5]} y={-y} x={branchDeltaX}/>
+			<Sprite texture={texture2} anchor={[0, 0.5]} y={-y + branchDeltaY2[type]} x={branchDeltaX2[type]}/>
+		</Container>
 	)
 };
 
@@ -109,12 +127,12 @@ const Tree = ({x, y, gameOver}) => {
 		setSpeedRaw(setter);
 	};
 	const [branches, setBranches] = React.useState([
-		{id: 1, y: 400, flipX: false, state: 0},
-		{id: 2, y: 550, flipX: true, state: 0},
-		{id: 3, y: 700, flipX: false, state: 0},
-		{id: 4, y: 850, flipX: true, state: 0},
-		{id: 5, y: 1000, flipX: false, state: 0},
-		{id: 6, y: 1150, flipX: true, state: 0},
+		{id: 1, y: 300, flipX: false, state: 0, type: "A"},
+		{id: 2, y: 450, flipX: true, state: 0, type: "B"},
+		{id: 3, y: 600, flipX: false, state: 0, type: "C"},
+		{id: 4, y: 750, flipX: true, state: 0, type: "A"},
+		{id: 5, y: 900, flipX: false, state: 0, type: "B"},
+		{id: 6, y: 1050, flipX: true, state: 0, type: "C"},
 	]);
 
 	const [birds, setBirds] = React.useState([]);
@@ -176,7 +194,9 @@ const Tree = ({x, y, gameOver}) => {
 	}, 4000);
 
 	const addBird = (bird, changeSpeed = true) => {
-		setBirds(birds => [...birds, {id: Math.random(), ...bird}])
+		const randomColor = () => Math.floor(Math.random() * 3) + 1;
+		const randomSize = () => ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];
+		setBirds(birds => [...birds, {id: Math.random(), color: randomColor(), size: randomSize(), ...bird}])
 		if (changeSpeed) {
 			setSpeed(speed => bird.x < 0 ? speed - landingSpeed : speed + landingSpeed);
 		}

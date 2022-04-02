@@ -1,5 +1,6 @@
 const TextureData = {
 	"Tree": "tree.json",
+	"Birds": "birds.json",
 
 	// Image:
 	// "key": "image.png",
