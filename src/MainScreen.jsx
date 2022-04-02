@@ -3,6 +3,7 @@ import Rectangle from "./components/Rectangle";
 import Circle from "./components/Circle";
 import {Container, Text} from "react-pixi-fiber/index.js";
 import {usePixiTicker} from "react-pixi-fiber/index.js";
+import getSpeed from "./getSpeed";
 
 const Trunk = () => {
 	return (
@@ -218,6 +219,8 @@ const Tree = ({gameOver}) => {
 			}
 			return false;
 		});
+		const speed = getSpeed().vx * movingStrength * 10;
+		setSpeed(speed);
 	}
 
 	return (
