@@ -36,6 +36,8 @@ const Trunk = () => {
 	)
 }
 
+// state = "flying", "standing"
+
 const Bird = ({bird: {x, y, size, color}, onClick, ...props}) => {
 	return (
 		<Sprite texture={Textures.Birds.get(`Bird_${size}_0${color}`)} anchor={0.5} x={x} y={-y} interactive buttonMode pointerdown={onClick}/>
@@ -133,6 +135,7 @@ const endAcceleration = 0.015; // Acceleration when we reach the limit angle
 const movingStrength = 0.02; // By how much the tree moves when we drag it
 const inertiaStrength = movingStrength * 10; // By how much the tree moves when we release it
 const releaseTimeout = 500; // How long we can hold a branch
+const birdSpeed = 40;
 
 const Tree = ({x, y, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
@@ -182,7 +185,7 @@ const Tree = ({x, y, gameOver}) => {
 		}
 
 		let a = angle * aFactor;
-		birds.forEach(b => {
+		birds.filter(b => b.state === "standing").forEach(b => {
 			if (b.x > 0) {
 				a += bFactor;
 			} else {
@@ -194,7 +197,40 @@ const Tree = ({x, y, gameOver}) => {
 		}
 		setSpeedRaw(speed => speed + a);
 		setAngle(angle => isHoldingBranch.current ? angle : angle + delta * speed);
+
+		setBirds(birds => birds.flatMap(bird => {
+			if (bird.state === "flying") {
+				const result = flyBird(bird, delta);
+				if (result.state == "standing") {
+					setSpeed(speed => result.x < 0 ? speed - landingSpeed : speed + landingSpeed);
+				}
+				return [result];
+			} else if (bird.state === "leaving") {
+				const result = flyBird(bird, delta);
+				if (result.state == "standing") {
+					return []
+				}
+				return [result];
+			} else {
+				return [bird];
+			}
+		}))
 	});
+
+	const flyBird = (bird, delta) => {
+		if (bird.x == bird.dest.x && bird.y == bird.dest.y) {
+			return {...bird, state: "standing"};
+		}
+		const deltaX = bird.dest.x - bird.x;
+		const deltaY = bird.dest.y - bird.y;
+		const theta = Math.atan2(deltaY, deltaX);
+		const dist = delta * birdSpeed;
+		const totalDist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+		if (dist >= totalDist) {
+			return {...bird, x: bird.dest.x, y: bird.dest.y, state: "standing"};
+		}
+		return {...bird, x: bird.x + dist / totalDist * deltaX, y: bird.y + dist / totalDist * deltaY};
+	}
 
 	// Birds arriving
 	useInterval(() => {
@@ -206,25 +242,33 @@ const Tree = ({x, y, gameOver}) => {
 		setBirds(birds => {
 			const index = Math.floor(Math.random() * birds.length);
 			setSpeed(speed => birds[index].x < 0 ? speed - takeOffSpeed : speed + takeOffSpeed);
-			return birds.filter(b => b !== birds[index]);
+			return birds.map(b => b === birds[index] ? {...b, state: "leaving", dest: {x: 1000, y: 800}}: b);
+			// return birds.filter(b => b !== birds[index]);
 		});
 	}, 4000);
 
 	const addBird = (bird, changeSpeed = true) => {
 		const randomColor = () => Math.floor(Math.random() * 3) + 1;
 		const randomSize = () => ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];
-		setBirds(birds => [...birds, {id: Math.random(), color: randomColor(), size: randomSize(), ...bird}])
-		if (changeSpeed) {
-			setSpeed(speed => bird.x < 0 ? speed - landingSpeed : speed + landingSpeed);
+		const newBird = {
+			id: Math.random(),
+			color: randomColor(),
+			size: randomSize(),
+			x: -1000,
+			y: Math.random() * 1000,
+			dest: bird,
+			state: "flying",
 		}
+		setBirds(birds => [...birds, newBird])
+		// if (changeSpeed) {
+		// 	setSpeed(speed => bird.x < 0 ? speed - landingSpeed : speed + landingSpeed);
+		// }
 	};
 
 	const flipBird = id => () => {
 		const bird = birds.find(b => b.id === id);
 		const newPosition = findPosition(branches, -bird.x);
-		setBirds(birds.map(b => b === bird ? {...b, ...newPosition} : b));
-		const previousX = birds.find(b => b.id === id).x;
-		setSpeed(speed => previousX > 0 ? speed - landingSpeed : speed + landingSpeed);
+		setBirds(birds.map(b => b === bird ? {...b, dest: newPosition, state: "flying"} : b));
 	};
 
 	const timeoutRef = React.useRef();
