@@ -1,40 +1,12 @@
 import * as React from "react";
+import { Container, Sprite, Text, usePixiTicker } from "react-pixi-fiber/index.js";
+import { findPosition, Branch } from "./Branch";
 import Rectangle from "./components/Rectangle";
-import Circle from "./components/Circle";
-import {Sprite, Container, Text} from "react-pixi-fiber/index.js";
-import {usePixiTicker} from "react-pixi-fiber/index.js";
 import getSpeed from "./getSpeed";
-import {Textures} from "./Loader";
-
-const treeEndState = 1;
-
-const trunkY = 35;
-const treeY = -35;
-const backgroundY = -830;
-const endY = [null, 12, 6, 2];
-
-const TrunkFloor = () => {
-	const endTexture = Textures.Tree.get("TreeEnd_0" + treeEndState);
-	return (
-		<>
-			<Sprite texture={Textures.Tree.get("Trunk")} anchor={[0.5, 0]} y={trunkY}/>
-			<Sprite texture={endTexture} anchor={[0.5, 1]} y={0} scale={[1, -1]} y={-endY[treeEndState]}/>
-		</>
-	);
-}
-
-const Trunk = () => {
-	const endTexture = Textures.Tree.get("TreeEnd_0" + treeEndState);
-
-	return (
-		<>
-			<Circle x={0} y={-900} radius={700} fill={0x00AA00}/>
-			<Sprite texture={Textures.Tree.get("TreeBack")} anchor={0.5} y={backgroundY}/>
-			<Sprite texture={Textures.Tree.get("Tree")} anchor={[0.5, 1]} y={treeY}/>
-			<Sprite texture={endTexture} anchor={[0.5, 1]} y={0} y={endY[treeEndState]}/>
-		</>
-	)
-}
+import { Textures } from "./Loader";
+import { TrunkFloor, Trunk } from "./Tree";
+import { useInterval } from "./useInterval";
+import { useWindowEventListener } from "./useWindowEventListener";
 
 // state = "flying", "standing"
 
@@ -43,91 +15,6 @@ const Bird = ({bird: {x, y, size, color}, onClick, ...props}) => {
 		<Sprite texture={Textures.Birds.get(`Bird_${size}_0${color}`)} anchor={0.5} x={x} y={-y} interactive buttonMode pointerdown={onClick}/>
 	)
 }
-
-const useInterval = (callback, interval) => {
-	const cbRef = React.useRef();
-	React.useEffect(() => {
-		cbRef.current = callback;
-	}, [callback]);
-	React.useEffect(() => {
-		const id = setInterval(() => {cbRef.current();}, interval);
-		return () => clearInterval(id)
-	}, [interval]);
-};
-
-const useWindowEventListener = (event, listener) => {
-	React.useEffect(() => {
-		window.addEventListener(event, listener);
-		return () => window.removeEventListener(event, listener);
-	}, [event, listener]);
-};
-
-const branchDeltaX = 36;
-const branchDeltaX2 = 45;
-const branchDeltaX3 = {
-	"A": 180,
-	"B": 170,
-	"C": 160,
-}
-const branchDeltaY3 = {
-	"A": -11,
-	"B": 3,
-	"C": -6,
-};
-
-const Branch = ({branch: {y, flipX, state, type}, onClick}) => {
-	const texture1 = Textures.Tree.get(`Branch_${type}_01`);
-	const texture2 = Textures.Tree.get(`Branch_${type}_02`);
-	const texture3 = Textures.Tree.get(`Branch_${type}_03`);
-	const angle3 = state == 1 ? 30 : 0;
-	const angle2 = state == 3 ? 30 : 0;
-
-	return (
-		<Container scale={[flipX ? -1 : 1, 1]}>
-			{state <= 3 && (
-				<Container x={branchDeltaX} y={-y} angle={angle2}>
-					<Rectangle
-						y={-30}
-						width={170}
-						height={60}
-						alpha={0.001}
-						interactive
-						buttonMode
-						pointerdown={onClick}
-					/>
-				</Container>
-			)}
-			{state <= 1 && (
-				<Container x={branchDeltaX + 160} y={-y} angle={angle3}>
-					<Rectangle
-						y={-30}
-						width={170}
-						height={60}
-						alpha={0.001}
-						interactive
-						buttonMode
-						pointerdown={onClick}
-					/>
-				</Container>
-			)}
-			<Sprite texture={texture1} anchor={[0, 0.5]} y={-y} x={branchDeltaX}/>
-			{state <= 3 && <Sprite texture={texture2} anchor={[0, 0.5]} y={-y} x={branchDeltaX2} angle={angle2}/>}
-			{state <= 1 && <Sprite texture={texture3} anchor={[0, 0.5]} y={-y + branchDeltaY3[type]} x={branchDeltaX3[type]} angle={angle3}/>}
-		</Container>
-	)
-};
-
-const findPosition = (branches, sign = 0) => {
-	if (sign > 0) {
-		branches = branches.filter(branch => !branch.flipX);
-	} else if (sign < 0) {
-		branches = branches.filter(branch => branch.flipX);
-	}
-	const branch = branches[Math.floor(Math.random() * branches.length)];
-	const y = branch.y + 30;
-	const x = (50 + Math.random() * 300) * (branch.flipX ? -1 : 1);
-	return {x, y};
-};
 
 const aFactor = 1e-5;  // Influence of one degree
 const bFactor = 4e-5; // Influence of one bird
@@ -150,12 +37,12 @@ const Tree = ({x, y, gameOver}) => {
 		setSpeedRaw(setter);
 	};
 	const [branches, setBranches] = React.useState([
-		{id: 1, y: 300, flipX: false, state: 0, type: "A"},
-		{id: 2, y: 450, flipX: true, state: 0, type: "B"},
-		{id: 3, y: 600, flipX: false, state: 0, type: "C"},
-		{id: 4, y: 750, flipX: true, state: 0, type: "A"},
-		{id: 5, y: 900, flipX: false, state: 0, type: "B"},
-		{id: 6, y: 1050, flipX: true, state: 0, type: "C"},
+		{id: 1, y: 300,  flipX: false, state: 0, type: "A"},
+		{id: 2, y: 450,  flipX: true,  state: 0, type: "B"},
+		{id: 3, y: 600,  flipX: false, state: 0, type: "C"},
+		{id: 4, y: 750,  flipX: true,  state: 0, type: "A"},
+		{id: 5, y: 900,  flipX: false, state: 0, type: "B"},
+		{id: 6, y: 1050, flipX: true,  state: 0, type: "C"},
 	]);
 
 	const [birds, setBirds] = React.useState([]);
@@ -245,10 +132,15 @@ const Tree = ({x, y, gameOver}) => {
 		setBirds(birds => {
 			const index = Math.floor(Math.random() * birds.length);
 			setSpeed(speed => birds[index].x < 0 ? speed - takeOffSpeed : speed + takeOffSpeed);
-			return birds.map(b => b === birds[index] ? {...b, state: "leaving", dest: {x: 1000, y: 800}}: b);
+			return birds.map(b => b === birds[index] ? {...b, state: "leaving", dest: randomDestination()} : b);
 			// return birds.filter(b => b !== birds[index]);
 		});
 	}, 4000);
+
+	const randomDestination = () => ({
+		x: Math.random() > 0.5 ? -1000 : 1000,
+		y: Math.random() * 1000,
+	});
 
 	const addBird = (bird, changeSpeed = true) => {
 		const randomColor = () => Math.floor(Math.random() * 3) + 1;
@@ -257,8 +149,7 @@ const Tree = ({x, y, gameOver}) => {
 			id: Math.random(),
 			color: randomColor(),
 			size: randomSize(),
-			x: -1000,
-			y: Math.random() * 1000,
+			...randomDestination(),
 			dest: bird,
 			state: "flying",
 		}
