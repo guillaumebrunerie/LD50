@@ -201,7 +201,7 @@ const Tree = ({gameOver}) => {
 				return;
 			}
 			setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: branch.state + 1} : branch))
-			const speed = getSpeed().vx * Math.abs(getSpeed().vx) * inertiaStrength;
+			const speed = getSpeed().vx * movingStrength * 10;
 			setSpeedRaw(speed);
 			return null;
 		})
