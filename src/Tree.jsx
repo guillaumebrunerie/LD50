@@ -249,6 +249,10 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		y: Math.random() * 1000,
 	});
 
+	const scareAllBirds = () => {
+		birds.forEach(bird => removeBird(bird));
+	}
+
 	const removeRandomBird = () => {
 		const standingBirds = birds.filter(bird => bird.state == "standing");
 		if (standingBirds.length == 0) {
@@ -370,6 +374,19 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		}
 	});
 
+	const scareBeaver = () => {
+		switch (beaverStatus.state) {
+		case "hidden":
+			setBeaverStatus({...beaverStatus, timeout: waitingTime});
+			break;
+		case "chopping":
+		case "leaving":
+		case "arriving":
+			setBeaverStatus({...beaverStatus, state: "leaving", dest: {x: 500, y: 60}, timeout: 0});
+			break;
+		}
+	}
+
 	const beeHiveAcceleration = 0.3;
 	const [beeHive, setBeeHive] = React.useState({state: "attached", x: 150, y: -300, speed: 0, timeout: 0, angle: 0,});
 
@@ -384,6 +401,8 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 	useTicker(delta => {
 		if (beeHive.state === "falling" && beeHive.y >= 0) {
 			setBeeHive({...beeHive, state: "fallen", y: 0, timeout: bearAppearDuration, flipped: angle < 0})
+			scareAllBirds();
+			scareBeaver();
 		} else if (beeHive.state == "falling") {
 			setBeeHive({...beeHive, speed: beeHive.speed + beeHiveAcceleration, y: beeHive.y + beeHive.speed * delta});
 		} else if (beeHive.state == "fallen") {
