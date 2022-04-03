@@ -138,12 +138,12 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		setSpeedRaw(setter);
 	};
 	const [branches, setBranches] = React.useState([
-		{id: 1, y: 300,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "A"},
-		{id: 2, y: 450,  flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "B"},
-		{id: 3, y: 600,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "C"},
-		{id: 4, y: 750,  flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "A"},
-		{id: 5, y: 900,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "B"},
-		{id: 6, y: 1050, flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "C"},
+		{id: 1, x: 36, y: -300,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "A"},
+		{id: 2, x: 36, y: -450,  flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "B"},
+		{id: 3, x: 36, y: -600,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "C"},
+		{id: 4, x: 36, y: -750,  flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "A"},
+		{id: 5, x: 36, y: -900,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "B"},
+		{id: 6, x: 36, y: -1050, flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "C"},
 	]);
 
 	const [birds, setBirds] = React.useState([]);
@@ -317,15 +317,39 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		const angle1 = getBranchAngle();
 		const deltaAngle = Math.abs(getBranchAngle());
 		const angle2 = angle1 > 0 ? angle1 - deltaAngle : angle1 + deltaAngle;
+
 		switch (branch.state) {
 		case 0:
 			return {...branch, state: 1, angle2: angle1};
 		case 1:
 			return {...branch, state: 2, angle1, angle2};
-		case 2:
-			return {...branch, dropping: true, state: 3, angle1, angle2};
+		case 2: {
+			const a = angle * Math.PI/180;
+			const origX = branch.x * (branch.flipX ? -1 : 1);
+			const origY = branch.y;
+			const x = (origX * Math.cos(a) - origY * Math.sin(a)) * (branch.flipX ? -1 : 1);
+			const y = origY * Math.cos(a) + origX * Math.sin(a);
+			const angle1 = branch.angle1 + (branch.flipX ? -1 : 1) * angle;
+			const angle2 = branch.angle2 + (branch.flipX ? -1 : 1) * angle;
+			return {...branch, x, y, dropping: true, state: 3, angle1, angle2, speed: 3};
+		}
 		}
 	}
+
+	const branchAcceleration = 0.5;
+
+	useTicker(delta => {
+		setBranches(branches.map(branch => {
+			if (!branch.dropping || branch.dropped) {
+				return branch;
+			}
+			const dropped = branch.y > 0;
+			if (dropped) {
+				scareBeaver();
+			}
+			return {...branch, dropped, y: branch.y + branch.speed, speed: branch.speed + branchAcceleration * delta}
+		}));
+	});
 
 	const branchSpeed = 0.2;
 	const holdBranch = branch => () => {
@@ -337,14 +361,14 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 
 	const beaverSpeed = 0.5;
 	const choppingTime = 3000;
-	const waitingTime = 1000;
+	const waitingTime = 10000;
 	const beaverY = 180;
 	const beaverX = 110;
 	// state: "hidden", "arriving", "chopping", "leaving"
 	const [beaverStatus, setBeaverStatus] = React.useState({state: "hidden", x: 500, y: beaverY, timeout: waitingTime})
 
-	useTicker(() => {
-		const deltaMS = PIXI.Ticker.shared.deltaMS;
+	useTicker(delta => {
+		const deltaMS = delta * 16.67;
 		if (!isGameOver && beaverStatus.timeout > deltaMS) {
 			setBeaverStatus({...beaverStatus, timeout: beaverStatus.timeout - deltaMS});
 		} else {
@@ -392,7 +416,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		}
 	}
 
-	const beeHiveAcceleration = 0.3;
+	const beeHiveAcceleration = 0.5;
 	const [beeHive, setBeeHive] = React.useState({state: "attached", x: 150, y: -300, speed: 0, timeout: 0, angle: 0,});
 
 	const dropBeeHive = () => {
@@ -404,6 +428,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 	}
 
 	useTicker(delta => {
+		const deltaMS = delta * 16.67;
 		if (beeHive.state === "falling" && beeHive.y >= 0) {
 			setBeeHive({...beeHive, state: "fallen", y: 0, timeout: bearAppearDuration, flipped: angle < 0})
 			scareAllBirds();
@@ -411,14 +436,14 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		} else if (beeHive.state == "falling") {
 			setBeeHive({...beeHive, speed: beeHive.speed + beeHiveAcceleration, y: beeHive.y + beeHive.speed * delta});
 		} else if (beeHive.state == "fallen") {
-			const timeout = beeHive.timeout - PIXI.Ticker.shared.deltaMS;
+			const timeout = beeHive.timeout - deltaMS;
 			if (timeout > 0) {
 				setBeeHive({...beeHive, timeout});
 			} else {
 				setBeeHive({...beeHive, state: "grabbing", angle, timeout: bearStraightenDuration});
 			}
 		} else if (beeHive.state == "grabbing") {
-			const timeout = beeHive.timeout - PIXI.Ticker.shared.deltaMS;
+			const timeout = beeHive.timeout - deltaMS;
 			if (timeout > 0) {
 				setSpeedRaw(0);
 				setAngle(timeout / bearStraightenDuration * beeHive.angle);
@@ -427,7 +452,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 				setBeeHive({...beeHive, state: "disappearing", timeout: bearDisappearDuration});
 			}
 		} else if (beeHive.state == "disappearing") {
-			const timeout = beeHive.timeout - PIXI.Ticker.shared.deltaMS;
+			const timeout = beeHive.timeout - deltaMS;
 			if (timeout > 0) {
 				setBeeHive({...beeHive, timeout});
 			} else {
@@ -441,7 +466,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		setOwl({state: "hidden"});
 	}
 
-	// const debugThings = [...new Array(100).keys()].map(() => findPosition(branches, []));
+	const debugThings = [...new Array(0).keys()].map(() => findPosition(branches, []));
 
 	return (
 		<Container x={x} y={y}>
@@ -451,7 +476,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 				<Owl owl={owl} onClick={owlTrigger}/>
 				<Trunk state={treeState}/>
 				{["fallen", "grabbing", "disappearing"].includes(beeHive.state) && <Bear x={-44} y={-90} flipped={beeHive.flipped} state={beeHive.state}/>}
-				{branches.map(branch => (
+				{branches.filter(b => !b.dropping).map(branch => (
 					<Branch
 						key={branch.id}
 						branch={branch}
@@ -466,8 +491,12 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 						onClick={flipBird(bird)}
 					/>
 				))}
+				{debugThings.map(({x, y}, i) => <Circle key={i} x={x} y={y}/>)}
 			</Container>
 			{beeHive.state !== "attached" && <BeeHive x={beeHive.x} y={beeHive.y}/>}
+			{branches.filter(b => b.dropping).map(branch => (
+				<Branch key={branch.id} branch={branch}/>
+			))}
 			{beaverStatus.state == "chopping" && <AnimatedSprite loop={Animations.WoodShavingsLoop} anchor={0.5}/>}
 			<Beaver beaver={beaverStatus}/>
 		</Container>

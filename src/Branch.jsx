@@ -3,8 +3,8 @@ import { Container, Sprite } from "react-pixi-fiber/index.js";
 import Rectangle from "./components/Rectangle";
 import { Textures } from "./Loader";
 
-const branchDeltaX = 36;
-const branchDeltaX2 = 45;
+// const branchDeltaX = 36;
+const branchDeltaX2 = 9;
 const branchDeltaY3 = {
 	"A": -7,
 	"B": 3,
@@ -28,24 +28,24 @@ const anchors3 = {
 
 const margin = 20;
 
-export const Branch = ({ branch: { y, flipX, state, angle1, angle2, type }, onClick }) => {
+export const Branch = ({ branch: { x, y, flipX, dropping, state, angle1, angle2, type }, onClick }) => {
 	const texture1 = Textures.Tree.get(`Branch_${type}_01`);
 	const texture2 = Textures.Tree.get(`Branch_${type}_02`);
 	const texture3 = Textures.Tree.get(`Branch_${type}_03`);
 
-	const leftX = branchDeltaX2;
-	const leftY = -y;
+	const leftX = x;
+	const leftY = y;
 
 	const middleX = leftX + branchLength2[type] * Math.cos(angle1 * Math.PI/180) - branchDeltaY3[type] * Math.sin(angle1 * Math.PI/180);
 	const middleY = leftY + branchLength2[type] * Math.sin(angle1 * Math.PI/180) + branchDeltaY3[type] * Math.cos(angle1 * Math.PI/180);
 
 	return (
 		<Container scale={[flipX ? -1 : 1, 1]}>
-			<Sprite texture={texture1} anchor={[0, 0.5]} y={-y} x={branchDeltaX} />
-			{state <= 2 && <Sprite texture={texture2} anchor={[0, 0.5]} y={-y} x={branchDeltaX2} angle={angle1} />}
-			{state <= 2 && <Sprite texture={texture3} anchor={anchors3[type]} y={middleY} x={middleX} angle={angle2} />}
+			<Sprite texture={texture1} anchor={[0, 0.5]} y={y} x={x} />
+			{state <= 3 && <Sprite texture={texture2} anchor={[0, 0.5]} y={y} x={x + branchDeltaX2} angle={angle1} />}
+			{state <= 3 && <Sprite texture={texture3} anchor={anchors3[type]} y={middleY} x={middleX} angle={angle2} />}
 			{state <= 2 && (
-				<Container x={branchDeltaX2} y={-y} angle={angle1}>
+				<Container x={x + branchDeltaX2} y={y} angle={angle1}>
 					<Rectangle
 						x={-margin}
 						y={-30}
@@ -87,10 +87,10 @@ export const findPosition = (branches, birds, sign = 0) => {
 	let tries = 0;
 	do {
 		const branch = branches[Math.floor(Math.random() * branches.length)];
-		const {type, angle1, angle2, flipX} = branch;
+		const {type, x:bx, y:by, angle1, angle2, flipX} = branch;
 
-		const leftX = branchDeltaX2;
-		const leftY = -branch.y;
+		const leftX = bx;
+		const leftY = by;
 
 		const middleX = leftX + branchLength2[type] * Math.cos(angle1 * Math.PI/180) - branchDeltaY3[type] * Math.sin(angle1 * Math.PI/180);
 		const middleY = leftY + branchLength2[type] * Math.sin(angle1 * Math.PI/180) + branchDeltaY3[type] * Math.cos(angle1 * Math.PI/180);
@@ -106,7 +106,7 @@ export const findPosition = (branches, birds, sign = 0) => {
 		}
 
 		if (tries == 100 || birds.length == 0 || birds.every(bird => Math.pow(bird.x - x, 2) + Math.pow(bird.y - y, 2) >= birdDistanceSquared)) {
-			return {x, y: -y, branch};
+			return {x, y, branch};
 		}
 		tries++;
 	} while (tries <= 100);
