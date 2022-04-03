@@ -1,7 +1,8 @@
 export const TextureData = {
 	"Tree": "tree.json",
 	"Birds": "birds.json",
-
+	"Owl": "Owl.png",
+	"BeeHive": "BeeHive.png",
 	// Image:
 	// "key": "image.png",
 

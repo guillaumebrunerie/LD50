@@ -48,6 +48,13 @@ const useOnMount = (callback) => {
 	});
 };
 
+const hiveX = 150;
+const hiveY = -300;
+
+const BeeHive = props => {
+	return <Sprite texture={Textures.BeeHive} anchor={[0.5, 0]} {...props}/>
+}
+
 const Tree = ({x, y, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
 	const [speed, setSpeedRaw] = React.useState(0);
@@ -237,6 +244,7 @@ const Tree = ({x, y, gameOver}) => {
 						onClick={holdBranch(id)}
 					/>
 				))}
+				<BeeHive x={hiveX} y={hiveY} angle={-angle}/>
 				{birds.map(({id, ...bird}) => <Bird key={id} bird={bird} onClick={flipBird(id)}/>)}
 			</Container>
 		</>
