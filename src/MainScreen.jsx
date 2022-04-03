@@ -4,6 +4,7 @@ import {Textures} from "./Loader";
 import Tree from "./Tree";
 import { sound } from '@pixi/sound';
 import useButton from "@hooks/useButton";
+import useLocalTime from "@hooks/useLocalTime";
 import * as PIXI from "pixi.js";
 
 const StartButton = ({onClick}) => {
@@ -45,11 +46,19 @@ const MainScreen = () => {
 			setIsGameOver(false);
 		});
 		setStartTime(Date.now());
+		reset();
 	}
+
+	const {t, reset} = useLocalTime();
+	const levelSpeed = 3;
+	const levelDistance = 2500;
+	const previousTreeX = 360 - t * levelSpeed;
+	const treeX = Math.max(levelDistance - t * levelSpeed, 360)
 
 	return (
 		<Container>
-			<Tree key={attempt} isGameOver={isGameOver} gameOver={gameOver} x={360} y={1280 - 115}/>
+			<Tree key={attempt - 1} isGameOver={true} gameOver={() => {}} x={previousTreeX} y={1280 - 115}/>
+			<Tree key={attempt} isGameOver={isGameOver} gameOver={gameOver} x={treeX} y={1280 - 115}/>
 			{isGameOver && <Text x={10} y={10} text={"Game over"}/>}
 			{isGameOver && lastScore > 0 && <Text x={10} y={40} text={`You lasted ${lastScore} seconds\nHigh score: ${highScore} seconds`}/>}
 			{isGameOver && <StartButton onClick={newGame}/>}
