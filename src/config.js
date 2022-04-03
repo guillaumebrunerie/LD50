@@ -1,4 +1,7 @@
 export const TextureData = {
+	"StartBtnDefault": "StartBtnDefault.png",
+	"StartBtnOn": "StartBtnOn.png",
+
 	"Tree": "tree.json",
 	"Owl": "Owl.png",
 	"BeeHive": "BeeHive.png",

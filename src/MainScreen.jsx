@@ -1,23 +1,23 @@
 import * as React from "react";
-import { Container, Text } from "react-pixi-fiber/index.js";
-import Rectangle from "./components/Rectangle";
+import { Container, Text, Sprite } from "react-pixi-fiber/index.js";
+import {Textures} from "./Loader";
 import Tree from "./Tree";
 import { sound } from '@pixi/sound';
+import useButton from "@hooks/useButton";
+import * as PIXI from "pixi.js";
 
 const StartButton = ({onClick}) => {
+	const {isActive, props} = useButton({onClick});
+
 	return (
-		<Rectangle
-			x={150}
-			y={800}
-			width={400}
-			height={150}
-			fill={0x880088}
-			interactive
-			buttonMode
-			pointerdown={onClick}
-		>
-			<Text x={350} y={875} anchor={0.5} text="START"/>
-		</Rectangle>
+		<Sprite
+			texture={isActive ? Textures.StartBtnOn : Textures.StartBtnDefault}
+			anchor={0.5}
+			x={360}
+			y={875}
+			hitArea={new PIXI.Rectangle(-200, -100, 400, 200)}
+			{...props}
+		/>
 	);
 };
 
