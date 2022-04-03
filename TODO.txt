@@ -9,7 +9,7 @@ Programming tasks
 Graphical tasks
 ---------------
 
-- Background
+- Background + tree
 - Owl animation
 - Bee hive breaking animation
 - Bear animations
