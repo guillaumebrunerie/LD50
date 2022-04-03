@@ -42,17 +42,17 @@ const useOnMount = (callback) => {
 	});
 };
 
-const trunkY = 35;
-const treeY = -35;
+const stumpY = 37;
+const treeY = -37;
 const backgroundY = -830;
 const owlY = -820;
-const endY = -50;
+const endY = -52;
 
-const TrunkFloor = ({state: {level, broken}}) => {
+const Stump = ({state: {level, broken}}) => {
 	const endTexture = Textures.Tree.get("TreeEnd_0" + level + (broken ? "_Broken" : ""));
 	return (
 		<>
-			<Sprite texture={Textures.Tree.get("Trunk")} anchor={[0.5, 0]} y={trunkY} />
+			<Sprite texture={Textures.Tree.get("Trunk")} anchor={[0.5, 0]} y={stumpY} />
 			<Sprite texture={endTexture} anchor={[0.5, 0]} y={0} scale={[1, -1]} y={-endY} />
 		</>
 	);
@@ -306,11 +306,9 @@ const Tree = ({x, y, gameOver}) => {
 	})
 
 	return (
-		<>
-			<Container x={x} y={y}>
-				<TrunkFloor state={treeState}/>
-			</Container>
-			<Container angle={angle} x={x} y={y}>
+		<Container x={x} y={y}>
+			<Stump state={treeState}/>
+			<Container angle={angle}>
 				<Trunk state={treeState}/>
 				{branches.map(({id, ...branch}) => (
 					<Branch
@@ -320,11 +318,17 @@ const Tree = ({x, y, gameOver}) => {
 					/>
 				))}
 				<BeeHive x={hiveX} y={hiveY} angle={-angle}/>
-				{birds.map(({id, ...bird}) => <Bird key={id} bird={bird} onClick={flipBird(id)}/>)}
+				{birds.map(({id, ...bird}) => (
+					<Bird
+						key={id}
+						bird={bird}
+						onClick={flipBird(id)}
+					/>
+				))}
 			</Container>
-			{beaverStatus.state == "chopping" && <AnimatedSprite loop={Animations.WoodShavingsLoop} anchor={0.5} x={x} y={y}/>}
-			<Beaver x={x} y={y} beaver={beaverStatus}/>
-		</>
+			{beaverStatus.state == "chopping" && <AnimatedSprite loop={Animations.WoodShavingsLoop} anchor={0.5}/>}
+			<Beaver beaver={beaverStatus}/>
+		</Container>
 	);
 };
 
