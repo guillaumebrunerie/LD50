@@ -60,9 +60,11 @@ const MainScreen = () => {
 		<Container>
 			<Tree key={attempt - 1} isGameOver={true} gameOver={() => {}} x={previousTreeX} y={1280 - 115}/>
 			<Tree key={attempt} isFirstScreen={attempt == 0} isGameOver={isGameOver} gameOver={gameOver} x={treeX} y={1280 - 115}/>
+			{!isGameOver && <Text x={10} y={10} text={`Score: ${((Date.now() - startTime) / 1000).toFixed(1)} seconds`}/>}
+			{isGameOver && lastScore > 0 && <Text x={10} y={10} text={`Score: ${lastScore} seconds`}/>}
 			{isGameOver && <Sprite texture={Textures.Logo} x={360} y={350} anchor={0.5}/>}
-			{isGameOver && attempt > 0 && <Text x={10} y={10} text={"Game over"}/>}
-			{isGameOver && lastScore > 0 && <Text x={10} y={40} text={`You lasted ${lastScore} seconds\nHigh score: ${highScore} seconds`}/>}
+			{isGameOver && lastScore > 0 && <Text x={10} y={40} text={`Game over!`}/>}
+			{isGameOver && lastScore > 0 && <Text x={10} y={70} text={`High score: ${highScore} seconds`}/>}
 			{isGameOver && <StartButton onClick={newGame}/>}
 		</Container>
 	);

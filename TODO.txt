@@ -4,6 +4,8 @@ Programming tasks
 - Birds sometimes land on non-existing branches
 - Birds sometimes land on top of each other
 - Timer keeps counting when game is paused
+- Tree behavior needs tweaking
+- Birds should fly away on game over
 
 
 Graphical tasks
