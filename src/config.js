@@ -3,6 +3,7 @@ export const TextureData = {
 	"Owl": "Owl.png",
 	"BeeHive": "BeeHive.png",
 	"Beaver": "Beaver.png",
+	"Bear": "Bear.png",
 	"Birds": {
 		file: "birds.json",
 		fps: 10,

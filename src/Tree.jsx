@@ -3,10 +3,12 @@ import * as PIXI from "pixi.js"
 import { Container, Sprite, Text, usePixiTicker } from "react-pixi-fiber/index.js";
 import { findPosition, Branch } from "./Branch";
 import Circle from "./components/Circle";
+import Rectangle from "./components/Rectangle";
 import getSpeed from "./getSpeed";
 import { Textures, Animations } from "./Loader";
 import { useInterval } from "./useInterval";
 import { useWindowEventListener } from "./useWindowEventListener";
+import useLocalTime from "./hooks/useLocalTime";
 import { sound } from '@pixi/sound';
 import Bird from "./Bird";
 import Beaver from "./Beaver";
@@ -73,11 +75,8 @@ const Trunk = ({state: {level, broken}}) => {
 	);
 };
 
-const hiveX = 150;
-const hiveY = -300;
-
-const BeeHive = props => {
-	return <Sprite texture={Textures.BeeHive} anchor={[0.5, 0]} {...props}/>
+const BeeHive = ({onClick, ...props}) => {
+	return <Sprite texture={Textures.BeeHive} anchor={[0.5, 0]} buttonMode interactive pointerdown={onClick} {...props}/>
 }
 
 const useTicker = (callback) => {
@@ -91,6 +90,20 @@ const useTicker = (callback) => {
 		tickerRef.current(...args);
 	}, []));
 };
+
+const Bear = (props) => {
+	const {t} = useLocalTime();
+	const mask = React.useRef();
+	const angle = Math.max(35 - t * 0.1, 0);
+
+	return (
+		<>
+			<Sprite texture={Textures.Bear} anchor={[1, 1]} angle={angle} mask={mask.current} 
+					{...props}/>
+			<Rectangle ref={mask} x={props.x - 300} y={props.y - 700} width={300} height={700}/>
+		</>
+	)
+}
 
 const Tree = ({x, y, isGameOver, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
@@ -348,11 +361,34 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		}
 	});
 
+	const beeHiveAcceleration = 0.3;
+	const [beeHive, setBeeHive] = React.useState({state: "attached", x: 150, y: -300, speed: 0});
+
+	const dropBeeHive = () => {
+		setBeeHive({...beeHive, state: "falling"});
+	}
+
+	useTicker(delta => {
+		if (beeHive.state === "falling" && beeHive.y >= 0) {
+			setBeeHive({...beeHive, state: "fallen", y: 0, timeout: 2000})
+		} else if (beeHive.state == "falling") {
+			setBeeHive({...beeHive, speed: beeHive.speed + beeHiveAcceleration, y: beeHive.y + beeHive.speed * delta});
+		} else if (beeHive.state == "fallen") {
+			const timeout = beeHive.timeout - PIXI.Ticker.shared.deltaMS;
+			if (timeout > 0) {
+				setBeeHive({...beeHive, timeout});
+			} else {
+				setBeeHive({...beeHive, state: "gone"});
+			}
+		}
+	})
+
 	return (
 		<Container x={x} y={y}>
 			<Stump state={treeState}/>
 			<Container angle={angle}>
 				<Trunk state={treeState}/>
+				{beeHive.state === "fallen" && <Bear x={-44} y={-100}/>}
 				{branches.map(({id, ...branch}) => (
 					<Branch
 						key={id}
@@ -360,7 +396,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 						onClick={holdBranch(id)}
 					/>
 				))}
-				<BeeHive x={hiveX} y={hiveY} angle={-angle}/>
+				{beeHive.state === "attached" && <BeeHive x={beeHive.x} y={beeHive.y} angle={-angle} onClick={dropBeeHive}/>}
 				{birds.map(({id, ...bird}) => (
 					<Bird
 						key={id}
@@ -369,6 +405,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 					/>
 				))}
 			</Container>
+			{beeHive.state !== "attached" && <BeeHive x={beeHive.x} y={beeHive.y} onClick={dropBeeHive}/>}
 			{beaverStatus.state == "chopping" && <AnimatedSprite loop={Animations.WoodShavingsLoop} anchor={0.5}/>}
 			<Beaver beaver={beaverStatus}/>
 		</Container>

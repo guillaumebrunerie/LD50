@@ -1,9 +1,10 @@
 import * as React from "react";
 import {Graphics} from "react-pixi-fiber/index.js";
 
-const Rectangle = (props) => {
+const Rectangle = React.forwardRef((props, ref) => {
 	const {x = 0, y = 0, width = 100, height = width, fill = 0xFF00FF, center = false, alpha = 1, ...rest} = props;
-	const ref = instance => {
+	const cbRef = instance => {
+		ref && (ref.current = instance);
 		if (instance) {
 			instance.clear();
 			instance.beginFill(fill, alpha);
@@ -15,7 +16,7 @@ const Rectangle = (props) => {
 			instance.endFill();
 		}
 	};
-	return <Graphics ref={ref} {...rest}/>
-}
+	return <Graphics ref={cbRef} {...rest}/>
+});
 
 export default Rectangle;
