@@ -12,6 +12,7 @@ import Bird from "./Bird";
 import Beaver from "./Beaver";
 import AnimatedSprite from "./components/AnimatedSprite";
 
+const treeFactor = [0.2, 1, 5];
 const aFactor = 1e-5;  // Influence of one degree
 const bFactor = 4e-5; // Influence of one bird
 const landingSpeed = 0.05; // Influence of one bird landing
@@ -127,7 +128,8 @@ const Tree = ({x, y, gameOver}) => {
 				if (bird.state === "flying") {
 					const result = flyBird(bird, delta);
 					if (result.state == "standing") {
-						setSpeed(speed => result.x < 0 ? speed - landingSpeed : speed + landingSpeed);
+						const deltaSpeed = landingSpeed * treeFactor[treeState.level - 1];
+						setSpeed(speed => result.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
 					}
 					return [result];
 				} else if (bird.state === "leaving") {
@@ -146,12 +148,12 @@ const Tree = ({x, y, gameOver}) => {
 			return;
 		}
 
-		let a = angle * aFactor;
+		let a = angle * aFactor * treeFactor[treeState.level - 1];
 		birds.filter(b => b.state === "standing").forEach(b => {
 			if (b.x > 0) {
-				a += bFactor;
+				a += bFactor * treeFactor[treeState.level - 1];
 			} else {
-				a -= bFactor;
+				a -= bFactor * treeFactor[treeState.level - 1];
 			}
 		});
 		if (Math.abs(angle) > limitAngle) {
@@ -206,7 +208,8 @@ const Tree = ({x, y, gameOver}) => {
 	const removeBird = () => {
 		setBirds(birds => {
 			const index = Math.floor(Math.random() * birds.length);
-			setSpeed(speed => birds[index].x < 0 ? speed - takeOffSpeed : speed + takeOffSpeed);
+			const deltaSpeed = takeOffSpeed * treeFactor[treeState.level - 1];
+			setSpeed(speed => birds[index].x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
 			return birds.map(b => b === birds[index] ? {...b, state: "leaving", dest: randomDestination()} : b);
 		});
 	}
@@ -267,8 +270,8 @@ const Tree = ({x, y, gameOver}) => {
 	});
 
 	const beaverSpeed = 0.5;
-	const choppingTime = 2000;
-	const waitingTime = 3000;
+	const choppingTime = 3000;
+	const waitingTime = 10000;
 	// state: "hidden", "arriving", "chopping", "leaving"
 	const [beaverStatus, setBeaverStatus] = React.useState({state: "hidden", x: 500, y: 60, timeout: waitingTime})
 
