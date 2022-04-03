@@ -41,9 +41,9 @@ export const Branch = ({ branch: { x, y, flipX, dropping, state, angle1, angle2,
 
 	return (
 		<Container scale={[flipX ? -1 : 1, 1]}>
-			<Sprite texture={texture1} anchor={[0, 0.5]} y={y} x={x} />
-			{state <= 3 && <Sprite texture={texture2} anchor={[0, 0.5]} y={y} x={x + branchDeltaX2} angle={angle1} />}
-			{state <= 3 && <Sprite texture={texture3} anchor={anchors3[type]} y={middleY} x={middleX} angle={angle2} />}
+			{dropping || <Sprite texture={texture1} anchor={[0, 0.5]} y={y} x={x} />}
+			{(state <= 2 || dropping) && <Sprite texture={texture2} anchor={[0, 0.5]} y={y} x={x + branchDeltaX2} angle={angle1} />}
+			{(state <= 2 || dropping) && <Sprite texture={texture3} anchor={anchors3[type]} y={middleY} x={middleX} angle={angle2} />}
 			{state <= 2 && (
 				<Container x={x + branchDeltaX2} y={y} angle={angle1}>
 					<Rectangle
@@ -84,6 +84,10 @@ export const findPosition = (branches, birds, sign = 0) => {
 	}
 	branches = branches.filter(branch => branch.state <= 2);
 
+	if (branches.length == 0) {
+		return null;
+	}
+
 	let tries = 0;
 	do {
 		const branch = branches[Math.floor(Math.random() * branches.length)];
@@ -95,7 +99,7 @@ export const findPosition = (branches, birds, sign = 0) => {
 		const middleX = leftX + branchLength2[type] * Math.cos(angle1 * Math.PI/180) - branchDeltaY3[type] * Math.sin(angle1 * Math.PI/180);
 		const middleY = leftY + branchLength2[type] * Math.sin(angle1 * Math.PI/180) + branchDeltaY3[type] * Math.cos(angle1 * Math.PI/180);
 
-		let x, y = leftY;
+		let x, y;
 		const t = Math.random();
 		if (t < 0.5) {
 			x = (flipX ? -1 : 1) * (leftX + t * 2 * Math.cos(angle1 * Math.PI/180) * branchLength2[type]);
@@ -105,9 +109,10 @@ export const findPosition = (branches, birds, sign = 0) => {
 			y = middleY + (t - 0.5) * 2 * Math.sin(angle2 * Math.PI/180) * branchLength3[type];
 		}
 
-		if (tries == 100 || birds.length == 0 || birds.every(bird => Math.pow(bird.x - x, 2) + Math.pow(bird.y - y, 2) >= birdDistanceSquared)) {
+		if (birds.every(bird => Math.pow(bird.x - x, 2) + Math.pow(bird.y - y, 2) >= birdDistanceSquared)) {
 			return {x, y, branch};
 		}
 		tries++;
 	} while (tries <= 100);
+	return null;
 };

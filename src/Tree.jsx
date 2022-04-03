@@ -296,6 +296,9 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	}
 
 	const addBird = (dest) => {
+		if (!dest) {
+			return;
+		}
 		const randomColor = () => Math.floor(Math.random() * 3) + 1;
 		const randomSize = () => ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];
 		const newBird = {
@@ -310,9 +313,13 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	};
 
 	const flipBird = bird => () => {
-		const newPosition = findPosition(branches, birds, -bird.x);
-		setBirds(birds.map(b => b === bird ? {...b, dest: newPosition, state: "flying"} : b));
 		sound.play("Chirp");
+		const newPosition = findPosition(branches, birds, -bird.x);
+		if (!newPosition) {
+			removeBird(bird);
+			return;
+		}
+		setBirds(birds.map(b => b === bird ? {...b, dest: newPosition, state: "flying"} : b));
 	};
 
 	const getBranchAngle = () => {
@@ -326,9 +333,9 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 
 		switch (branch.state) {
 		case 0:
-			return {...branch, state: 1, angle2: angle1};
+			return [{...branch, state: 1, angle2: angle1}];
 		case 1:
-			return {...branch, state: 2, angle1, angle2};
+			return [{...branch, state: 2, angle1, angle2}];
 		case 2: {
 			const a = angle * Math.PI/180;
 			const origX = branch.x * (branch.flipX ? -1 : 1);
@@ -337,7 +344,10 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			const y = origY * Math.cos(a) + origX * Math.sin(a);
 			const angle1 = branch.angle1 + (branch.flipX ? -1 : 1) * angle;
 			const angle2 = branch.angle2 + (branch.flipX ? -1 : 1) * angle;
-			return {...branch, x, y, dropping: true, state: 3, angle1, angle2, speed: 3};
+			return [
+				{...branch, state: 3},
+				{...branch, x, y, dropping: true, state: 3, angle1, angle2, speed: 3}
+			];
 		}
 		}
 	}
@@ -361,7 +371,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const holdBranch = branch => () => {
 		const deltaSpeed = (0.5 + Math.random() / 2) * branchSpeed;
 		setSpeedRaw(branch.flipX ? speed - deltaSpeed : speed + deltaSpeed);
-		setBranches(branches.map(b => b === branch ? breakBranch(b) : b))
+		setBranches(branches.flatMap(b => b === branch ? breakBranch(b) : [b]))
 		scareBirds(branch.id);
 	};
 
@@ -497,7 +507,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				{branches.filter(b => !b.dropping).map(branch => (
 					<Branch
 						key={branch.id}
-						branch={branch}
+						branch={{...branch, dropping: false}}
 						onClick={holdBranch(branch)}
 					/>
 				))}
