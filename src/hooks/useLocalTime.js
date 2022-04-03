@@ -4,7 +4,7 @@ import {
 	usePixiTicker,
 } from "react-pixi-fiber/index.js";
 
-const useLocalTime = ({factor = 1, callback}) => {
+const useLocalTime = ({factor = 1, callback} = {factor: 1}) => {
 	const [t, setT] = React.useState(0);
 	const [delta, setDelta] = React.useState(0);
 	const tick = React.useCallback(() => {

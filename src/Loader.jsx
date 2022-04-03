@@ -14,13 +14,6 @@ const getSpriteSheet = resource => ({
 	}
 });
 
-const getTextureAt = (res, tileWidth = 24, tileHeight = 24, frame) => {
-	const tilesX = Math.floor(res.texture.width / tileWidth);
-	const x = (frame % tilesX) * tileWidth;
-	const y = Math.floor(frame / tilesX) * tileHeight;
-	return new PIXI.Texture(res.texture.baseTexture, new PIXI.Rectangle(x, y, tileWidth, tileHeight));
-};
-
 const loadTextures = (callback) => {
 	const loader = PIXI.Loader.shared;
 
@@ -35,14 +28,13 @@ const loadTextures = (callback) => {
 	loader.load((_, resources) => {
 		Object.entries(TextureData).forEach(([key, value]) => {
 			if (typeof value === "string") {
-				if (value.endsWith(".json")) {
-					Textures[key] = getSpriteSheet(resources[key]);
-				} else {
-					Textures[key] = resources[key].texture;
-				}
+				value = {file: value};
+			}
+			const {file} = value;
+			if (file.endsWith(".json")) {
+				Textures[key] = getSpriteSheet(resources[key]);
 			} else {
-				const {tileWidth, tileHeight} = value;
-				Textures[key] = {get: frame => getTextureAt(resources[key], tileWidth, tileHeight, frame)};
+				Textures[key] = resources[key].texture;
 			}
 		});
 		callback();
@@ -50,10 +42,11 @@ const loadTextures = (callback) => {
 }
 
 const getAnimation = (value) => {
-	const {file, tileWidth, tileHeight, start, end, fps, loops = 1} = value;
+	const {key, name, start, end, fps, loops = 1} = value;
 	const textures = [];
-	for (let frame = start; frame < end; frame++) {
-		textures.push(getTextureAt(file, tileWidth, tileHeight, frame));
+	const spriteSheet = Textures[key];
+	for (let frame = start; frame <= end; frame++) {
+		textures.push(spriteSheet.get(name + `${frame}`.padStart(2, '0')));
 	}
 	const at = (t) => textures[Math.floor(t * fps / 1000) % textures.length];
 	const duration = 1000/fps * textures.length * loops;
@@ -61,18 +54,23 @@ const getAnimation = (value) => {
 	return {at, duration};
 }
 
-export const Animations = Object.fromEntries(Object.entries(TextureData).map(([key, value]) => [
-	key,
-	value.animations && Object.fromEntries(Object.entries(value.animations).map(([animKey, animation]) => [
-		animKey,
-		getAnimation({...value, ...animation})
-	])
-)]));
+export const Animations = {}
+
+const loadAnimations = () => {
+	Object.entries(TextureData).forEach(([key, value]) => {
+		Object.entries(value.animations || {}).forEach(([animKey, animation]) => {
+			Animations[animKey] = getAnimation({key, ...value, ...animation});
+		})
+	})
+};
 
 export const Loader = ({children}) => {
 	const [isLoading, setIsLoading] = React.useState(true);
 
-	React.useEffect(() => loadTextures(() => setIsLoading(false)), []);
+	React.useEffect(() => loadTextures(() => {
+		loadAnimations();
+		setIsLoading(false);
+	}), []);
 
 	return isLoading ? null : children;
 }
@@ -80,6 +78,8 @@ export const Loader = ({children}) => {
 if (import.meta.webpackHot) {
 	import.meta.webpackHot.accept("./config", () => {
 		PIXI.Loader.shared.reset();
-		loadTextures(() => {});
+		loadTextures(() => {
+			loadAnimations();
+		});
 	})
 }

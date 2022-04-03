@@ -20,7 +20,7 @@ const endAcceleration = 0.015; // Acceleration when we reach the limit angle
 const movingStrength = 0.02; // By how much the tree moves when we drag it
 const inertiaStrength = movingStrength * 10; // By how much the tree moves when we release it
 const releaseTimeout = 500; // How long we can hold a branch
-const birdSpeed = 40;
+const birdSpeed = 10;
 const birdProbabilities = [
 	{"in": 1, "out": 0}, // Probabilities of birds arriving/leaving when there is 0
 	{"in": 1, "out": 0}, // 1

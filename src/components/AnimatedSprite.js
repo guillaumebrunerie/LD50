@@ -30,7 +30,7 @@ const AnimatedSprite = (props) => {
 	}, [isFinished]);
 
 	return (
-			<Sprite texture={anim.at(t)} {...rest}/>
+		<Sprite texture={anim.at(t)} {...rest}/>
 	)
 }
 
