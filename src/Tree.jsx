@@ -33,7 +33,7 @@ const birdProbabilities = [
 
 const useOnMount = (callback) => {
 	const [alreadyCalled, setAlreadyCalled] = React.useState(false);
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		if (!alreadyCalled) {
 			callback();
 			setAlreadyCalled(true);
@@ -128,7 +128,7 @@ const Bear = ({x, y, flipped, state, ...props}) => {
 
 const getAngle = () => (Math.random() - 0.5) * 20
 
-const Tree = ({x, y, isGameOver, gameOver}) => {
+const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
 	const [speed, setSpeedRaw] = React.useState(0);
 	const setSpeed = setter => {
@@ -150,14 +150,19 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 	const [treeState, setTreeState] = React.useState({level: 1, broken: false});
 
 	useOnMount(() => {
-		setTimeout(() => {
-			addBird(findPosition(branches, [], 1));
-			addBird(findPosition(branches, [], -1));
-		}, 0);
-		setTimeout(() => {
-			addBird(findPosition(branches, [], 1));
-			addBird(findPosition(branches, [], -1));
-		}, 500);
+		if (isFirstScreen) {
+			setAngle(-90);
+			setBeeHive({state: "gone", y: -2000});
+		} else {
+			setTimeout(() => {
+				addBird(findPosition(branches, [], 1));
+				addBird(findPosition(branches, [], -1));
+			}, 1000);
+			setTimeout(() => {
+				addBird(findPosition(branches, [], 1));
+				addBird(findPosition(branches, [], -1));
+			}, 1500);
+		}
 	});
 
 	let baseAcceleration = Math.sin(angle * Math.PI/180) * 90 * aFactor * treeFactor[treeState.level - 1];
