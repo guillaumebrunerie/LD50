@@ -91,17 +91,18 @@ const useTicker = (callback) => {
 	}, []));
 };
 
-const Bear = (props) => {
+const Bear = ({x, y, flipped, ...props}) => {
 	const {t} = useLocalTime();
 	const mask = React.useRef();
 	const angle = Math.max(35 - t * 0.1, 0);
 
 	return (
-		<>
-			<Sprite texture={Textures.Bear} anchor={[1, 1]} angle={angle} mask={mask.current} 
+		<Container scale={[flipped ? -1 : 1, 1]}>
+			<Sprite texture={Textures.Bear} anchor={[1, 1]} angle={angle} mask={mask.current}
+					x={x} y={y}
 					{...props}/>
-			<Rectangle ref={mask} x={props.x - 300} y={props.y - 700} width={300} height={700}/>
-		</>
+			<Rectangle ref={mask} x={x - 300} y={y - 700} width={300} height={700}/>
+		</Container>
 	)
 }
 
@@ -365,12 +366,16 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 	const [beeHive, setBeeHive] = React.useState({state: "attached", x: 150, y: -300, speed: 0});
 
 	const dropBeeHive = () => {
-		setBeeHive({...beeHive, state: "falling"});
+		const hiveAngle = Math.atan2(beeHive.y, beeHive.x);
+		const hiveDistance = Math.sqrt(beeHive.x * beeHive.x + beeHive.y * beeHive.y);
+		const x = hiveDistance * Math.cos(hiveAngle + angle * Math.PI/180);
+		const y = hiveDistance * Math.sin(hiveAngle + angle * Math.PI/180);
+		setBeeHive({...beeHive, state: "falling", x, y, speed: 4});
 	}
 
 	useTicker(delta => {
 		if (beeHive.state === "falling" && beeHive.y >= 0) {
-			setBeeHive({...beeHive, state: "fallen", y: 0, timeout: 2000})
+			setBeeHive({...beeHive, state: "fallen", y: 0, timeout: 2000, flipped: angle < 0})
 		} else if (beeHive.state == "falling") {
 			setBeeHive({...beeHive, speed: beeHive.speed + beeHiveAcceleration, y: beeHive.y + beeHive.speed * delta});
 		} else if (beeHive.state == "fallen") {
@@ -388,7 +393,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 			<Stump state={treeState}/>
 			<Container angle={angle}>
 				<Trunk state={treeState}/>
-				{beeHive.state === "fallen" && <Bear x={-44} y={-100}/>}
+				{beeHive.state === "fallen" && <Bear x={-44} y={-90} flipped={beeHive.flipped}/>}
 				{branches.map(({id, ...branch}) => (
 					<Branch
 						key={id}
