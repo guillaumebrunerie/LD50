@@ -76,7 +76,7 @@ const Trunk = ({state: {level, broken}}) => {
 };
 
 const BeeHive = ({onClick, ...props}) => {
-	return <Sprite texture={Textures.BeeHive} anchor={[0.5, 0]} buttonMode interactive pointerdown={onClick} {...props}/>
+	return <Sprite texture={Textures.BeeHive} anchor={[0.5, 0]} buttonMode={!!onClick} interactive={!!onClick} pointerdown={onClick} {...props}/>
 }
 
 const useTicker = (callback) => {
@@ -434,7 +434,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 					/>
 				))}
 			</Container>
-			{beeHive.state !== "attached" && <BeeHive x={beeHive.x} y={beeHive.y} onClick={dropBeeHive}/>}
+			{beeHive.state !== "attached" && <BeeHive x={beeHive.x} y={beeHive.y}/>}
 			{beaverStatus.state == "chopping" && <AnimatedSprite loop={Animations.WoodShavingsLoop} anchor={0.5}/>}
 			<Beaver beaver={beaverStatus}/>
 		</Container>
