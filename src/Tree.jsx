@@ -80,6 +80,18 @@ const BeeHive = props => {
 	return <Sprite texture={Textures.BeeHive} anchor={[0.5, 0]} {...props}/>
 }
 
+const useTicker = (callback) => {
+	const tickerRef = React.useRef(() => {});
+
+	React.useLayoutEffect(() => {
+		tickerRef.current = callback;
+	}, [callback]);
+
+	usePixiTicker(React.useCallback((...args) => {
+		tickerRef.current(...args);
+	}, []));
+};
+
 const Tree = ({x, y, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
 	const [speed, setSpeedRaw] = React.useState(0);
@@ -114,7 +126,7 @@ const Tree = ({x, y, gameOver}) => {
 	});
 
 	// Main loop
-	usePixiTicker(delta => {
+	useTicker(delta => {
 		if (Math.abs(angle) >= 90) {
 			setAngle(90 * angle / Math.abs(angle));
 			setSpeedRaw(0);
@@ -123,26 +135,24 @@ const Tree = ({x, y, gameOver}) => {
 			return;
 		}
 
-		setTimeout(() => {
-			setBirds(birds => birds.flatMap(bird => {
-				if (bird.state === "flying") {
-					const result = flyBird(bird, delta);
-					if (result.state == "standing") {
-						const deltaSpeed = landingSpeed * treeFactor[treeState.level - 1];
-						setSpeed(speed => result.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
-					}
-					return [result];
-				} else if (bird.state === "leaving") {
-					const result = flyBird(bird, delta);
-					if (result.state == "standing") {
-						return []
-					}
-					return [result];
-				} else {
-					return [bird];
+		setBirds(birds => birds.flatMap(bird => {
+			if (bird.state === "flying") {
+				const result = flyBird(bird, delta);
+				if (result.state == "standing") {
+					const deltaSpeed = landingSpeed * treeFactor[treeState.level - 1];
+					setSpeed(speed => result.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
 				}
-			}))
-		});
+				return [result];
+			} else if (bird.state === "leaving") {
+				const result = flyBird(bird, delta);
+				if (result.state == "standing") {
+					return []
+				}
+				return [result];
+			} else {
+				return [bird];
+			}
+		}))
 
 		if (isHoldingBranch.current) {
 			return;
@@ -159,10 +169,8 @@ const Tree = ({x, y, gameOver}) => {
 		if (Math.abs(angle) > limitAngle) {
 			a += angle > 0 ? endAcceleration : -endAcceleration;
 		}
-		setTimeout(() => {
-			setSpeedRaw(speed => speed + a);
-			setAngle(angle => isHoldingBranch.current ? angle : angle + delta * speed);
-		});
+		setSpeedRaw(speed => speed + a);
+		setAngle(angle => isHoldingBranch.current ? angle : angle + delta * speed);
 	});
 
 	// Returns {arrived: boolean, x: number, y: number}
@@ -291,13 +299,12 @@ const Tree = ({x, y, gameOver}) => {
 	// state: "hidden", "arriving", "chopping", "leaving"
 	const [beaverStatus, setBeaverStatus] = React.useState({state: "hidden", x: 500, y: 60, timeout: waitingTime})
 
-	usePixiTicker(delta => {
-		delta = PIXI.Ticker.shared.deltaMS;
-		if (beaverStatus.timeout > delta) {
-			setBeaverStatus({...beaverStatus, timeout: beaverStatus.timeout - delta});
-			return;
-		}
-		switch (beaverStatus.state) {
+	useTicker(() => {
+		const deltaMS = PIXI.Ticker.shared.deltaMS;
+		if (beaverStatus.timeout > deltaMS) {
+			setBeaverStatus({...beaverStatus, timeout: beaverStatus.timeout - deltaMS});
+		} else {
+			switch (beaverStatus.state) {
 			case "hidden": {
 				setBeaverStatus({...beaverStatus, state: "arriving", x: 500, y: 60, dest: {x: 120, y: 60}, timeout: 0});
 				break;
@@ -311,7 +318,7 @@ const Tree = ({x, y, gameOver}) => {
 			}
 			case "leaving":
 			case "arriving": {
-				const {arrived, x, y} = move(beaverStatus, beaverStatus.dest, delta, beaverSpeed);
+				const {arrived, x, y} = move(beaverStatus, beaverStatus.dest, deltaMS, beaverSpeed);
 				if (arrived) {
 					const state = beaverStatus.state == "arriving" ? "chopping" : "hidden";
 					const timeout = beaverStatus.state == "arriving" ? choppingTime : waitingTime;
@@ -321,8 +328,9 @@ const Tree = ({x, y, gameOver}) => {
 				}
 				break;
 			}
+			}
 		}
-	})
+	});
 
 	return (
 		<Container x={x} y={y}>
