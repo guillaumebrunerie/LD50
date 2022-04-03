@@ -12,9 +12,9 @@ import Bird from "./Bird";
 import Beaver from "./Beaver";
 import AnimatedSprite from "./components/AnimatedSprite";
 
-const treeFactor = [0.2, 1, 5];
+const treeFactor = [0.3, 1, 3];
 const birdFactor = {"Small": 0.3, "Medium": 1, "Big": 3};
-const aFactor = 1e-5;  // Influence of one degree
+const aFactor = 2e-5;  // Influence of one degree
 const bFactor = 4e-5; // Influence of one bird
 const landingSpeed = 0.05; // Influence of one bird landing
 const takeOffSpeed = -0.02; // Influence of one bird leaving
@@ -57,14 +57,30 @@ const Stump = ({state: {level, broken}}) => {
 	);
 };
 
+const TrunkBack = () => {
+	return (
+		<>
+			<Circle x={0} y={-900} radius={700} fill={0x00AA00} />
+			<Sprite texture={Textures.Tree.get("TreeBack")} anchor={0.5} y={backgroundY} />
+		</>
+	)
+}
+
+const Owl = ({owl, onClick}) => {
+	if (owl.state === "hidden") {
+		return null;
+	}
+
+	return (
+		<Sprite texture={Textures.Owl} anchor={0.5} y={owlY} interactive buttonMode pointerdown={onClick}/>
+	)
+}
+
 const Trunk = ({state: {level, broken}}) => {
 	const endTexture = Textures.Tree.get("TreeEnd_0" + level + (broken ? "_Broken" : ""));
 
 	return (
 		<>
-			<Circle x={0} y={-900} radius={700} fill={0x00AA00} />
-			<Sprite texture={Textures.Tree.get("TreeBack")} anchor={0.5} y={backgroundY} />
-			<Sprite texture={Textures.Owl} anchor={0.5} y={owlY} />
 			<Sprite texture={Textures.Tree.get("Tree")} anchor={[0.5, 1]} y={treeY} />
 			<Sprite texture={endTexture} anchor={[0.5, 0]} y={0} y={endY} />
 		</>
@@ -144,7 +160,20 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		}, 500);
 	});
 
-	// Main loop
+	let baseAcceleration = Math.sin(angle * Math.PI/180) * 90 * aFactor * treeFactor[treeState.level - 1];
+	let acceleration = baseAcceleration;
+	birds.filter(b => b.state === "standing").forEach(b => {
+		if (b.x > 0) {
+			acceleration += bFactor * treeFactor[treeState.level - 1] * birdFactor[b.size];
+		} else {
+			acceleration -= bFactor * treeFactor[treeState.level - 1] * birdFactor[b.size];
+		}
+	});
+	if (Math.abs(angle) > limitAngle) {
+		acceleration += angle > 0 ? endAcceleration : -endAcceleration;
+	}
+
+	// "Main loop"
 	useTicker(delta => {
 		if (isGameOver) {
 			return;
@@ -158,19 +187,8 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 			return;
 		}
 
-		let a = angle * aFactor * treeFactor[treeState.level - 1];
-		birds.filter(b => b.state === "standing").forEach(b => {
-			if (b.x > 0) {
-				a += bFactor * treeFactor[treeState.level - 1] * birdFactor[b.size];
-			} else {
-				a -= bFactor * treeFactor[treeState.level - 1] * birdFactor[b.size];
-			}
-		});
-		if (Math.abs(angle) > limitAngle) {
-			a += angle > 0 ? endAcceleration : -endAcceleration;
-		}
-		setSpeedRaw(speed => speed + a);
-		setAngle(angle => angle + delta * speed);
+		setSpeedRaw(speed + acceleration);
+		setAngle(angle + delta * speed);
 	});
 
 	// Main loop for flying birds
@@ -418,12 +436,19 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		}
 	})
 
+	const [owl, setOwl] = React.useState({state: "watching"});
+	const owlTrigger = () => {
+		setOwl({state: "hidden"});
+	}
+
 	// const debugThings = [...new Array(100).keys()].map(() => findPosition(branches, []));
 
 	return (
 		<Container x={x} y={y}>
 			<Stump state={treeState}/>
 			<Container angle={angle}>
+				<TrunkBack/>
+				<Owl owl={owl} onClick={owlTrigger}/>
 				<Trunk state={treeState}/>
 				{["fallen", "grabbing", "disappearing"].includes(beeHive.state) && <Bear x={-44} y={-90} flipped={beeHive.flipped} state={beeHive.state}/>}
 				{branches.map(branch => (
@@ -441,7 +466,6 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 						onClick={flipBird(bird)}
 					/>
 				))}
-				{/*debugThings.map(({x, y}, i) => <Circle key={i} x={x} y={y}/>)*/}
 			</Container>
 			{beeHive.state !== "attached" && <BeeHive x={beeHive.x} y={beeHive.y}/>}
 			{beaverStatus.state == "chopping" && <AnimatedSprite loop={Animations.WoodShavingsLoop} anchor={0.5}/>}
@@ -450,4 +474,6 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 	);
 };
 
+			// <Text text={"Speed:" + Math.round(speed * 100)} x={0} y={0}/>
+			// <Text text={"Acceleration:" + Math.round(baseAcceleration * 10000) + " + " + Math.round((acceleration - baseAcceleration) * 10000)} x={0} y={-30}/>
 export default Tree;
