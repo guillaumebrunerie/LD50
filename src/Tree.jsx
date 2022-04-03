@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as PIXI from "pixi.js"
 import { Container, Sprite, Text, usePixiTicker } from "react-pixi-fiber/index.js";
 import { findPosition, Branch } from "./Branch";
 import Circle from "./components/Circle";
@@ -7,14 +8,8 @@ import { Textures } from "./Loader";
 import { useInterval } from "./useInterval";
 import { useWindowEventListener } from "./useWindowEventListener";
 import { sound } from '@pixi/sound';
-
-// state = "flying", "standing"
-
-const Bird = ({bird: {x, y, size, color}, onClick}) => {
-	return (
-		<Sprite texture={Textures.Birds.get(`Bird_${size}_0${color}`)} anchor={[0.5, 1]} x={x} y={-y} interactive buttonMode pointerdown={onClick}/>
-	)
-}
+import Bird from "./Bird";
+import Beaver from "./Beaver";
 
 const aFactor = 1e-5;  // Influence of one degree
 const bFactor = 4e-5; // Influence of one bird
@@ -126,23 +121,25 @@ const Tree = ({x, y, gameOver}) => {
 			return;
 		}
 
-		setBirds(birds => birds.flatMap(bird => {
-			if (bird.state === "flying") {
-				const result = flyBird(bird, delta);
-				if (result.state == "standing") {
-					setSpeed(speed => result.x < 0 ? speed - landingSpeed : speed + landingSpeed);
+		setTimeout(() => {
+			setBirds(birds => birds.flatMap(bird => {
+				if (bird.state === "flying") {
+					const result = flyBird(bird, delta);
+					if (result.state == "standing") {
+						setSpeed(speed => result.x < 0 ? speed - landingSpeed : speed + landingSpeed);
+					}
+					return [result];
+				} else if (bird.state === "leaving") {
+					const result = flyBird(bird, delta);
+					if (result.state == "standing") {
+						return []
+					}
+					return [result];
+				} else {
+					return [bird];
 				}
-				return [result];
-			} else if (bird.state === "leaving") {
-				const result = flyBird(bird, delta);
-				if (result.state == "standing") {
-					return []
-				}
-				return [result];
-			} else {
-				return [bird];
-			}
-		}))
+			}))
+		});
 
 		if (isHoldingBranch.current) {
 			return;
@@ -159,22 +156,34 @@ const Tree = ({x, y, gameOver}) => {
 		if (Math.abs(angle) > limitAngle) {
 			a += angle > 0 ? endAcceleration : -endAcceleration;
 		}
-		setSpeedRaw(speed => speed + a);
-		setAngle(angle => isHoldingBranch.current ? angle : angle + delta * speed);
+		setTimeout(() => {
+			setSpeedRaw(speed => speed + a);
+			setAngle(angle => isHoldingBranch.current ? angle : angle + delta * speed);
+		});
 	});
 
-	const flyBird = (bird, delta) => {
-		if (bird.x == bird.dest.x && bird.y == bird.dest.y) {
-			return {...bird, state: "standing"};
+	// Returns {arrived: boolean, x: number, y: number}
+	const move = (from, to, delta, speed) => {
+		if (from.x === to.x && from.y === to.y) {
+			return {arrived: true, x: from.x, y: from.y};
 		}
-		const deltaX = bird.dest.x - bird.x;
-		const deltaY = bird.dest.y - bird.y;
-		const dist = delta * birdSpeed;
+		const deltaX = to.x - from.x;
+		const deltaY = to.y - from.y;
+		const dist = delta * speed;
 		const totalDist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 		if (dist >= totalDist) {
-			return {...bird, x: bird.dest.x, y: bird.dest.y, state: "standing"};
+			return {arrived: true, x: to.x, y: to.y};
 		}
-		return {...bird, x: bird.x + dist / totalDist * deltaX, y: bird.y + dist / totalDist * deltaY};
+		return {arrived: false, x: from.x + dist / totalDist * deltaX, y: from.y + dist / totalDist * deltaY};
+	}
+
+	const flyBird = (bird, delta) => {
+		const {arrived, x, y} = move(bird, bird.dest, delta, birdSpeed);
+		if (arrived) {
+			return {...bird, x, y, state: "standing"};
+		} else {
+			return {...bird, x, y};
+		}
 	}
 
 	useInterval(() => {
@@ -256,6 +265,45 @@ const Tree = ({x, y, gameOver}) => {
 		}
 	});
 
+	const beaverSpeed = 0.5;
+	const choppingTime = 2000;
+	const waitingTime = 3000;
+	// state: "hidden", "arriving", "chopping", "leaving"
+	const [beaverStatus, setBeaverStatus] = React.useState({state: "hidden", x: 500, y: 60, timeout: waitingTime})
+
+	usePixiTicker(delta => {
+		delta = PIXI.Ticker.shared.deltaMS;
+		if (beaverStatus.timeout > delta) {
+			setBeaverStatus({...beaverStatus, timeout: beaverStatus.timeout - delta});
+			return;
+		}
+		switch (beaverStatus.state) {
+			case "hidden": {
+				setBeaverStatus({...beaverStatus, state: "arriving", x: 500, y: 60, dest: {x: 120, y: 60}, timeout: 0});
+				break;
+			}
+			case "chopping": {
+				if (treeState.level < 3) {
+					setTreeState({...treeState, level: treeState.level + 1});
+				}
+				setBeaverStatus({...beaverStatus, state: "leaving", dest: {x: -500, y: 60}, timeout: 0});
+				break;
+			}
+			case "leaving":
+			case "arriving": {
+				const {arrived, x, y} = move(beaverStatus, beaverStatus.dest, delta, beaverSpeed);
+				if (arrived) {
+					const state = beaverStatus.state == "arriving" ? "chopping" : "hidden";
+					const timeout = beaverStatus.state == "arriving" ? choppingTime : waitingTime;
+					setBeaverStatus({state, x, y, timeout});
+				} else {
+					setBeaverStatus({...beaverStatus, x, y});
+				}
+				break;
+			}
+		}
+	})
+
 	return (
 		<>
 			<Container x={x} y={y}>
@@ -273,6 +321,7 @@ const Tree = ({x, y, gameOver}) => {
 				<BeeHive x={hiveX} y={hiveY} angle={-angle}/>
 				{birds.map(({id, ...bird}) => <Bird key={id} bird={bird} onClick={flipBird(id)}/>)}
 			</Container>
+			<Beaver x={x} y={y} beaver={beaverStatus}/>
 		</>
 	);
 };
