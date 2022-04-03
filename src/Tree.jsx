@@ -245,8 +245,9 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		if (isGameOver) {
 			return;
 		}
-		const newBird = Math.random() < birdProbabilities[birds.length]["in"];
-		const birdLeaves = Math.random() < birdProbabilities[birds.length]["out"];
+		const data = birdProbabilities[birds.length]
+		const newBird = data ? Math.random() < data["in"] : 0;
+		const birdLeaves = data ? Math.random() < data["out"] : 0;
 		if (birdLeaves) {
 			removeRandomBird();
 		}
@@ -256,8 +257,8 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 	}, 1000);
 
 	const randomDestination = () => ({
-		x: Math.random() > 0.5 ? -1000 : 1000,
-		y: Math.random() * 1000,
+		x: Math.random() > 0.5 ? -400 : 400,
+		y: -Math.random() * 1000,
 	});
 
 	const scareAllBirds = () => {
@@ -343,7 +344,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 			if (!branch.dropping || branch.dropped) {
 				return branch;
 			}
-			const dropped = branch.y > 0;
+			const dropped = branch.y > 100;
 			if (dropped) {
 				scareBeaver();
 			}
@@ -464,6 +465,18 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 	const [owl, setOwl] = React.useState({state: "watching"});
 	const owlTrigger = () => {
 		setOwl({state: "hidden"});
+
+		const leftBirds = birds.filter(bird => bird.x < 0).length;
+		const rightBirds = birds.filter(bird => bird.x > 0).length;
+		// This is the desired left - right
+		const goal = angle > 20 ? 2 : angle > 10 ? 1 : angle > -10 ? 0 : angle > -20 ? -1 : -2;
+		const currentValue = leftBirds - rightBirds;
+		const signedBirdsToAddLeft = goal - currentValue;
+		const birdsToAddLeft = Math.ceil(Math.min(Math.max((4 + signedBirdsToAddLeft) / 2, 0), 4));
+		const birdsToAddRight = Math.ceil(Math.min(Math.max((4 - signedBirdsToAddLeft) / 2, 0), 4));
+		// Add 4 or 5 birds to try to reach an equilibrium
+		[...new Array(birdsToAddLeft).keys()].forEach(() => addBird(findPosition(branches, birds, -1)));
+		[...new Array(birdsToAddRight).keys()].forEach(() => addBird(findPosition(branches, birds, 1)));
 	}
 
 	const debugThings = [...new Array(0).keys()].map(() => findPosition(branches, []));
