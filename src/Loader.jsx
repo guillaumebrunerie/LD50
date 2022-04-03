@@ -1,7 +1,8 @@
 import React from "react";
 import * as PIXI from "pixi.js";
+import { sound } from '@pixi/sound';
 
-import TextureData from "./graphicsConfig";
+import {TextureData, SoundData} from "./config";
 
 export const Textures = {};
 
@@ -25,6 +26,10 @@ const loadTextures = (callback) => {
 
 	Object.entries(TextureData).forEach(([key, value]) => {
 		loader.add(key, "./dist/" + (typeof value === "string" ? value : value.file));
+	});
+
+	SoundData.forEach(key => {
+		sound.add(key, `./dist/${key}.mp3`);
 	});
 
 	loader.load((_, resources) => {
@@ -73,7 +78,7 @@ export const Loader = ({children}) => {
 }
 
 if (import.meta.webpackHot) {
-	import.meta.webpackHot.accept("./graphicsConfig", () => {
+	import.meta.webpackHot.accept("./config", () => {
 		PIXI.Loader.shared.reset();
 		loadTextures(() => {});
 	})

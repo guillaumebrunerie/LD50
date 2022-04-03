@@ -1,4 +1,4 @@
-const TextureData = {
+export const TextureData = {
 	"Tree": "tree.json",
 	"Birds": "birds.json",
 
@@ -20,4 +20,4 @@ const TextureData = {
 	// }
 };
 
-export default TextureData;
+export const SoundData = ["Chirp", "TreeCrashes"];

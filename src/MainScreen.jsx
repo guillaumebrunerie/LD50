@@ -7,6 +7,7 @@ import { Textures } from "./Loader";
 import { TrunkFloor, Trunk } from "./Tree";
 import { useInterval } from "./useInterval";
 import { useWindowEventListener } from "./useWindowEventListener";
+import { sound } from '@pixi/sound';
 
 // state = "flying", "standing"
 
@@ -159,6 +160,8 @@ const Tree = ({x, y, gameOver}) => {
 		const bird = birds.find(b => b.id === id);
 		const newPosition = findPosition(branches, -bird.x);
 		setBirds(birds.map(b => b === bird ? {...b, dest: newPosition, state: "flying"} : b));
+
+		sound.play("Chirp");
 	};
 
 	const timeoutRef = React.useRef();
@@ -238,6 +241,7 @@ const MainScreen = () => {
 	const gameOver = () => {
 		if (!isGameOver) {
 			setIsGameOver(true);
+			sound.play("TreeCrashes");
 			const deltaTime = Date.now() - startTime;
 			const score = Math.round(deltaTime / 100) / 10;
 			setLastScore(score);

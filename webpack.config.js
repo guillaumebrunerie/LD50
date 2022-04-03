@@ -42,6 +42,7 @@ module.exports = {
 		new CopyPlugin({
 			patterns: [
 				{ from: "gfx", to: "dist" },
+				{ from: "audio", to: "dist" },
 			],
 		}),
 		...isDevelopment ? [new ReactRefreshWebpackPlugin()] : []
