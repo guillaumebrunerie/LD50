@@ -6,17 +6,7 @@ export const TextureData = {
 	"Tree": "tree.json",
 	"Owl": "Owl.png",
 	"BeeHive": "BeeHive.png",
-	"Beaver": "Beaver.png",
 	"Bear": "Bear.png",
-	"Birds": {
-		file: "birds.json",
-		fps: 10,
-		animations: {
-			"FlySmall": {prefix: "Bird_Small_", start: 1, end: 3},
-			"FlyMedium": {prefix: "Bird_Medium_", start: 1, end: 3},
-			"FlyBig": {prefix: "Bird_Big_", start: 1, end: 3},
-		}
-	},
 	"WoodShavingsLoop": {
 		file: "WoodShavingsLoop.json",
 		fps: 10,
@@ -46,5 +36,65 @@ export const TextureData = {
 		}
 	},
 };
+
+export const AnimationData = {
+	"Bird_Big_FlyingLoop": {
+		infix: "_0",
+		fps: 25,
+		start: 0,
+		end: 11,
+	},
+	"Bird_Medium_FlyingLoop": {
+		infix: "_0",
+		fps: 25,
+		start: 0,
+		end: 11,
+	},
+	"Bird_Small_FlyingLoop": {
+		infix: "_0",
+		fps: 25,
+		start: 0,
+		end: 11,
+	},
+	"Bird_Big_Land": {
+		infix: "_0",
+		fps: 25,
+		start: 12,
+		end: 25,
+	},
+	"Bird_Medium_Land": {
+		infix: "_0",
+		fps: 25,
+		start: 12,
+		end: 25,
+	},
+	"Bird_Small_Land": {
+		infix: "_0",
+		fps: 25,
+		start: 12,
+		end: 25,
+	},
+	// "Bird_Big_Idle": {
+	// 	file: "Bird_Big_Land.json",
+	// 	prefix: "Bird_Big_Land",
+	// 	fps: 25,
+	// 	start: 25,
+	// 	end: 25,
+	// },
+	// "Bird_Medium_Idle": {
+	// 	file: "Bird_Medium_Land.json",
+	// 	prefix: "Bird_Medium_Land",
+	// 	fps: 25,
+	// 	start: 25,
+	// 	end: 25,
+	// },
+	// "Bird_Small_Idle": {
+	// 	file: "Bird_Small_Land.json",
+	// 	prefix: "Bird_Small_Land",
+	// 	fps: 25,
+	// 	start: 25,
+	// 	end: 25,
+	// },
+}
 
 export const SoundData = ["Chirp", "TreeCrashes"];

@@ -2,7 +2,7 @@ import React from "react";
 import * as PIXI from "pixi.js";
 import { sound } from '@pixi/sound';
 
-import {TextureData, SoundData} from "./config";
+import {TextureData, AnimationData, SoundData} from "./config";
 
 export const Textures = {};
 
@@ -21,6 +21,10 @@ const loadTextures = (callback) => {
 		loader.add(key, "./dist/" + (typeof value === "string" ? value : value.file));
 	});
 
+	Object.entries(AnimationData).forEach(([key, value]) => {
+		loader.add(key, "./dist/" + (value.file || (key + ".json")));
+	});
+
 	SoundData.forEach(key => {
 		sound.add(key, `./dist/${key}.mp3`);
 	});
@@ -36,6 +40,9 @@ const loadTextures = (callback) => {
 			} else {
 				Textures[key] = resources[key].texture;
 			}
+		});
+		Object.entries(AnimationData).forEach(([key, value]) => {
+			Textures[key] = getSpriteSheet(resources[key]);
 		});
 		callback();
 	});
@@ -61,6 +68,9 @@ const loadAnimations = () => {
 		Object.entries(value.animations || {}).forEach(([animKey, animation]) => {
 			Animations[animKey] = getAnimation({key, ...value, ...animation});
 		})
+	})
+	Object.entries(AnimationData).forEach(([key, value]) => {
+		Animations[key] = getAnimation({key, file: value.file || (key + ".json"), prefix: value.prefix || (key + value.infix), ...value})
 	})
 };
 
