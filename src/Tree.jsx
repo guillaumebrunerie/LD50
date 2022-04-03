@@ -4,10 +4,8 @@ import { Container, Sprite, Text, usePixiTicker } from "react-pixi-fiber/index.j
 import { findPosition, Branch } from "./Branch";
 import Circle from "./components/Circle";
 import Rectangle from "./components/Rectangle";
-import getSpeed from "./getSpeed";
 import { Textures, Animations } from "./Loader";
 import { useInterval } from "./useInterval";
-import { useWindowEventListener } from "./useWindowEventListener";
 import useLocalTime from "./hooks/useLocalTime";
 import { sound } from '@pixi/sound';
 import Bird from "./Bird";
@@ -15,15 +13,13 @@ import Beaver from "./Beaver";
 import AnimatedSprite from "./components/AnimatedSprite";
 
 const treeFactor = [0.2, 1, 5];
+const birdFactor = {"Small": 0.3, "Medium": 1, "Big": 3};
 const aFactor = 1e-5;  // Influence of one degree
 const bFactor = 4e-5; // Influence of one bird
 const landingSpeed = 0.05; // Influence of one bird landing
 const takeOffSpeed = -0.02; // Influence of one bird leaving
 const limitAngle = 20; // Max angle before the game is lost
 const endAcceleration = 0; //0.015; // Acceleration when we reach the limit angle
-const movingStrength = 0.02; // By how much the tree moves when we drag it
-const inertiaStrength = movingStrength * 10; // By how much the tree moves when we release it
-const releaseTimeout = 500; // How long we can hold a branch
 const birdSpeed = 10;
 const birdProbabilities = [
 	{"in": 1, "out": 0}, // Probabilities of birds arriving/leaving when there is 0
@@ -165,9 +161,9 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		let a = angle * aFactor * treeFactor[treeState.level - 1];
 		birds.filter(b => b.state === "standing").forEach(b => {
 			if (b.x > 0) {
-				a += bFactor * treeFactor[treeState.level - 1];
+				a += bFactor * treeFactor[treeState.level - 1] * birdFactor[b.size];
 			} else {
-				a -= bFactor * treeFactor[treeState.level - 1];
+				a -= bFactor * treeFactor[treeState.level - 1] * birdFactor[b.size];
 			}
 		});
 		if (Math.abs(angle) > limitAngle) {
@@ -187,7 +183,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 			if (bird.state === "flying") {
 				const result = flyBird(bird, delta);
 				if (result.state == "standing") {
-					const deltaSpeed = landingSpeed * treeFactor[treeState.level - 1];
+					const deltaSpeed = landingSpeed * treeFactor[treeState.level - 1] * birdFactor[bird.size];
 					setSpeed(speed => result.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
 				}
 				return [result];
@@ -261,7 +257,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 
 	const removeBird = (bird) => {
 		setBirds(birds => {
-			const deltaSpeed = takeOffSpeed * treeFactor[treeState.level - 1];
+			const deltaSpeed = takeOffSpeed * treeFactor[treeState.level - 1] * birdFactor[bird.size];
 			setSpeed(speed => bird.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
 			return birds.map(b => b === bird ? {...b, state: "leaving", dest: randomDestination()} : b);
 		});
