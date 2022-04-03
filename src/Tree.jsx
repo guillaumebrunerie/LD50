@@ -91,10 +91,18 @@ const useTicker = (callback) => {
 	}, []));
 };
 
-const Bear = ({x, y, flipped, ...props}) => {
+const bearAppearDuration = 300;
+const bearStraightenDuration = 700;
+const bearDisappearDuration = 300;
+
+const Bear = ({x, y, flipped, state, ...props}) => {
 	const {t} = useLocalTime();
 	const mask = React.useRef();
-	const angle = Math.max(35 - t * 0.1, 0);
+	const angle = {
+		"fallen": 35 * Math.max(1 - t / bearAppearDuration, 0),
+		"grabbing": 0,
+		"disappearing": 35 * Math.max((t - bearAppearDuration - bearStraightenDuration) / bearDisappearDuration, 0),
+	}[state];
 
 	return (
 		<Container scale={[flipped ? -1 : 1, 1]}>
@@ -363,7 +371,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 	});
 
 	const beeHiveAcceleration = 0.3;
-	const [beeHive, setBeeHive] = React.useState({state: "attached", x: 150, y: -300, speed: 0});
+	const [beeHive, setBeeHive] = React.useState({state: "attached", x: 150, y: -300, speed: 0, timeout: 0, angle: 0,});
 
 	const dropBeeHive = () => {
 		const hiveAngle = Math.atan2(beeHive.y, beeHive.x);
@@ -375,10 +383,26 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 
 	useTicker(delta => {
 		if (beeHive.state === "falling" && beeHive.y >= 0) {
-			setBeeHive({...beeHive, state: "fallen", y: 0, timeout: 2000, flipped: angle < 0})
+			setBeeHive({...beeHive, state: "fallen", y: 0, timeout: bearAppearDuration, flipped: angle < 0})
 		} else if (beeHive.state == "falling") {
 			setBeeHive({...beeHive, speed: beeHive.speed + beeHiveAcceleration, y: beeHive.y + beeHive.speed * delta});
 		} else if (beeHive.state == "fallen") {
+			const timeout = beeHive.timeout - PIXI.Ticker.shared.deltaMS;
+			if (timeout > 0) {
+				setBeeHive({...beeHive, timeout});
+			} else {
+				setBeeHive({...beeHive, state: "grabbing", angle, timeout: bearStraightenDuration});
+			}
+		} else if (beeHive.state == "grabbing") {
+			const timeout = beeHive.timeout - PIXI.Ticker.shared.deltaMS;
+			if (timeout > 0) {
+				setSpeedRaw(0);
+				setAngle(timeout / bearStraightenDuration * beeHive.angle);
+				setBeeHive({...beeHive, timeout});
+			} else {
+				setBeeHive({...beeHive, state: "disappearing", timeout: bearDisappearDuration});
+			}
+		} else if (beeHive.state == "disappearing") {
 			const timeout = beeHive.timeout - PIXI.Ticker.shared.deltaMS;
 			if (timeout > 0) {
 				setBeeHive({...beeHive, timeout});
@@ -393,7 +417,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 			<Stump state={treeState}/>
 			<Container angle={angle}>
 				<Trunk state={treeState}/>
-				{beeHive.state === "fallen" && <Bear x={-44} y={-90} flipped={beeHive.flipped}/>}
+				{["fallen", "grabbing", "disappearing"].includes(beeHive.state) && <Bear x={-44} y={-90} flipped={beeHive.flipped} state={beeHive.state}/>}
 				{branches.map(({id, ...branch}) => (
 					<Branch
 						key={id}
