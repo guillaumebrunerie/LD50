@@ -22,7 +22,28 @@ export const TextureData = {
 		animations: {
 			"WoodShavingsLoop": {prefix: "WoodShavingsLoop_0", start: 0, end: 4}
 		}
-	}
+	},
+	"BeaverRun": {
+		file: "BeaverRunCycle.json",
+		fps: 20,
+		animations: {
+			"BeaverRun": {prefix: "BeaverRunCycle0", start: 0, end: 11},
+		}
+	},
+	"BeaverAttack": {
+		file: "BeaverAttack.json",
+		fps: 15,
+		animations: {
+			"BeaverAttack": {prefix: "BeaverAttack0", start: 21, end: 26},
+		}
+	},
+	"BeaverTransition": {
+		file: "BeaverTransition.json",
+		fps: 25,
+		animations: {
+			"BeaverTransition": {prefix: "BeaverTransition0", start: 12, end: 20},
+		}
+	},
 };
 
 export const SoundData = ["Chirp", "TreeCrashes"];

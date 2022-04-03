@@ -14,7 +14,7 @@ import Bird from "./Bird";
 import Beaver from "./Beaver";
 import AnimatedSprite from "./components/AnimatedSprite";
 
-const treeFactor = [0, 0, 0]; //[0.2, 1, 5];
+const treeFactor = [0.2, 1, 5];
 const aFactor = 1e-5;  // Influence of one degree
 const bFactor = 4e-5; // Influence of one bird
 const landingSpeed = 0.05; // Influence of one bird landing
@@ -323,9 +323,11 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 
 	const beaverSpeed = 0.5;
 	const choppingTime = 3000;
-	const waitingTime = 10000;
+	const waitingTime = 1000;
+	const beaverY = 180;
+	const beaverX = 110;
 	// state: "hidden", "arriving", "chopping", "leaving"
-	const [beaverStatus, setBeaverStatus] = React.useState({state: "hidden", x: 500, y: 60, timeout: waitingTime})
+	const [beaverStatus, setBeaverStatus] = React.useState({state: "hidden", x: 500, y: beaverY, timeout: waitingTime})
 
 	useTicker(() => {
 		const deltaMS = PIXI.Ticker.shared.deltaMS;
@@ -335,7 +337,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 			switch (beaverStatus.state) {
 			case "hidden": {
 				if (!isGameOver) {
-					setBeaverStatus({...beaverStatus, state: "arriving", x: 500, y: 60, dest: {x: 120, y: 60}, timeout: 0});
+					setBeaverStatus({...beaverStatus, state: "arriving", x: 500, y: beaverY, dest: {x: beaverX, y: beaverY}, timeout: 0});
 				}
 				break;
 			}
@@ -343,7 +345,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 				if (!isGameOver && treeState.level < 3) {
 					setTreeState({...treeState, level: treeState.level + 1});
 				}
-				setBeaverStatus({...beaverStatus, state: "leaving", dest: {x: -500, y: 60}, timeout: 0});
+				setBeaverStatus({...beaverStatus, state: "leaving", dest: {x: -500, y: beaverY}, timeout: 0});
 				break;
 			}
 			case "leaving":
@@ -370,7 +372,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		case "chopping":
 		case "leaving":
 		case "arriving":
-			setBeaverStatus({...beaverStatus, state: "leaving", dest: {x: 500, y: 60}, timeout: 0});
+			setBeaverStatus({...beaverStatus, state: "leaving", dest: {x: 500, y: beaverY}, timeout: 0});
 			break;
 		}
 	}

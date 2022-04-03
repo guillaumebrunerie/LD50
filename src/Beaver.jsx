@@ -1,12 +1,24 @@
 import * as React from "react";
 import { Sprite } from "react-pixi-fiber/index.js";
-import { Textures } from "./Loader";
+import { Textures, Animations } from "./Loader";
+import AnimatedSprite from "@components/AnimatedSprite";
 
 const Beaver = ({ beaver: {x, y, state}, onClick }) => {
-	const spriteY = -y + (state == "chopping" ? Math.random() * 20 : 0);
-	return (
-		state !== "hidden" && <Sprite texture={Textures.Beaver} anchor={[0.5, 0]} x={x} y={spriteY}/>
-	);
+	let loop, start;
+
+	if (state == "arriving") {
+		loop = Animations.BeaverRun;
+	} else if (state === "leaving") {
+		// start = Animations.BeaverTransition;
+		loop = Animations.BeaverRun;
+	} else if (state === "chopping") {
+		start = Animations.BeaverTransition;
+		loop = Animations.BeaverAttack;
+	} else if (state === "hidden") {
+		return null;
+	}
+
+	return <AnimatedSprite key={state} start={start} loop={loop} anchor={[0.5, 0]} x={x} y={-y}/>
 };
 
 export default Beaver;
