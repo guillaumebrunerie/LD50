@@ -4,12 +4,13 @@ import { Container, Sprite, Text, usePixiTicker } from "react-pixi-fiber/index.j
 import { findPosition, Branch } from "./Branch";
 import Circle from "./components/Circle";
 import getSpeed from "./getSpeed";
-import { Textures } from "./Loader";
+import { Textures, Animations } from "./Loader";
 import { useInterval } from "./useInterval";
 import { useWindowEventListener } from "./useWindowEventListener";
 import { sound } from '@pixi/sound';
 import Bird from "./Bird";
 import Beaver from "./Beaver";
+import AnimatedSprite from "./components/AnimatedSprite";
 
 const aFactor = 1e-5;  // Influence of one degree
 const bFactor = 4e-5; // Influence of one bird
@@ -321,6 +322,7 @@ const Tree = ({x, y, gameOver}) => {
 				<BeeHive x={hiveX} y={hiveY} angle={-angle}/>
 				{birds.map(({id, ...bird}) => <Bird key={id} bird={bird} onClick={flipBird(id)}/>)}
 			</Container>
+			{beaverStatus.state == "chopping" && <AnimatedSprite loop={Animations.WoodShavingsLoop} anchor={0.5} x={x} y={y}/>}
 			<Beaver x={x} y={y} beaver={beaverStatus}/>
 		</>
 	);

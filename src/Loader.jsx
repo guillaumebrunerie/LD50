@@ -42,11 +42,11 @@ const loadTextures = (callback) => {
 }
 
 const getAnimation = (value) => {
-	const {key, name, start, end, fps, loops = 1} = value;
+	const {key, prefix, start, end, fps, loops = 1} = value;
 	const textures = [];
 	const spriteSheet = Textures[key];
 	for (let frame = start; frame <= end; frame++) {
-		textures.push(spriteSheet.get(name + `${frame}`.padStart(2, '0')));
+		textures.push(spriteSheet.get(prefix + `${frame}`.padStart(2, '0')));
 	}
 	const at = (t) => textures[Math.floor(t * fps / 1000) % textures.length];
 	const duration = 1000/fps * textures.length * loops;
