@@ -309,7 +309,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		case 1:
 			return {...branch, state: 2, angle1, angle2};
 		case 2:
-			return {...branch, state: 3, angle1, angle2};
+			return {...branch, dropping: true, state: 3, angle1, angle2};
 		}
 	}
 
@@ -317,7 +317,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 	const holdBranch = branch => () => {
 		const deltaSpeed = (0.5 + Math.random() / 2) * branchSpeed;
 		setSpeedRaw(branch.flipX ? speed - deltaSpeed : speed + deltaSpeed);
-		setBranches(branches => branches.map(b => b === branch ? breakBranch(b) : b))
+		setBranches(branches.map(b => b === branch ? breakBranch(b) : b))
 		scareBirds(branch.id);
 	};
 
@@ -379,10 +379,10 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 	const [beeHive, setBeeHive] = React.useState({state: "attached", x: 150, y: -300, speed: 0, timeout: 0, angle: 0,});
 
 	const dropBeeHive = () => {
-		const hiveAngle = Math.atan2(beeHive.y, beeHive.x);
-		const hiveDistance = Math.sqrt(beeHive.x * beeHive.x + beeHive.y * beeHive.y);
-		const x = hiveDistance * Math.cos(hiveAngle + angle * Math.PI/180);
-		const y = hiveDistance * Math.sin(hiveAngle + angle * Math.PI/180);
+		const a = angle * Math.PI/180;
+		const x = beeHive.x * Math.cos(a) - beeHive.y * Math.sin(a);
+		const y = beeHive.y * Math.cos(a) + beeHive.x * Math.sin(a);
+
 		setBeeHive({...beeHive, state: "falling", x, y, speed: 4});
 	}
 
