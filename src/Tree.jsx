@@ -452,6 +452,10 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	}
 
 	const dropBeeHive = () => {
+		if (beeHive.state !== "attached") {
+			return;
+		}
+
 		const a = angle * Math.PI/180;
 		const x = beeHive.x * Math.cos(a) - beeHive.y * Math.sin(a);
 		const y = beeHive.y * Math.cos(a) + beeHive.x * Math.sin(a);

@@ -1,0 +1,20 @@
+Programming tasks
+-----------------
+
+- Birds sometimes land on non-existing branches
+- Birds sometimes land on top of each other
+- Timer keeps counting when game is paused
+
+
+Graphical tasks
+---------------
+
+- Background
+- Owl animation
+- Bee hive breaking animation
+- Bear animations
+- Tree breaking animation (flash at the base when the tree falls)
+- Start/game over screen
+- Logo
+- Some UI stuff
+- Branch hitting the ground animation
