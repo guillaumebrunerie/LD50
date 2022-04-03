@@ -5,41 +5,47 @@ import { Textures } from "./Loader";
 
 const branchDeltaX = 36;
 const branchDeltaX2 = 45;
-const branchDeltaX3 = {
-	"A": 180,
-	"B": 170,
-	"C": 160,
-};
 const branchDeltaY3 = {
-	"A": -11,
+	"A": -7,
 	"B": 3,
 	"C": -6,
 };
 const branchLength2 = {
-	"A": 160,
-	"B": 150,
-	"C": 140,
+	"A": 150,
+	"B": 140,
+	"C": 125,
 }
 const branchLength3 = {
 	"A": 170,
 	"B": 150,
 	"C": 150,
 }
-const branchAngle = 30;
+const anchors3 = {
+	"A": [0.07, 0.8],
+	"B": [0.06, 0.5],
+	"C": [0.08, 0.5],
+}
 
 const margin = 20;
 
-export const Branch = ({ branch: { y, flipX, state, type }, onClick }) => {
+export const Branch = ({ branch: { y, flipX, state, angle1, angle2, type }, onClick }) => {
 	const texture1 = Textures.Tree.get(`Branch_${type}_01`);
 	const texture2 = Textures.Tree.get(`Branch_${type}_02`);
 	const texture3 = Textures.Tree.get(`Branch_${type}_03`);
-	const angle3 = state == 1 ? branchAngle : 0;
-	const angle2 = state == 3 ? branchAngle : 0;
+
+	const leftX = branchDeltaX2;
+	const leftY = -y;
+
+	const middleX = leftX + branchLength2[type] * Math.cos(angle1 * Math.PI/180) - branchDeltaY3[type] * Math.sin(angle1 * Math.PI/180);
+	const middleY = leftY + branchLength2[type] * Math.sin(angle1 * Math.PI/180) + branchDeltaY3[type] * Math.cos(angle1 * Math.PI/180);
 
 	return (
 		<Container scale={[flipX ? -1 : 1, 1]}>
-			{state <= 3 && (
-				<Container x={branchDeltaX2} y={-y} angle={angle2}>
+			<Sprite texture={texture1} anchor={[0, 0.5]} y={-y} x={branchDeltaX} />
+			{state <= 2 && <Sprite texture={texture2} anchor={[0, 0.5]} y={-y} x={branchDeltaX2} angle={angle1} />}
+			{state <= 2 && <Sprite texture={texture3} anchor={anchors3[type]} y={middleY} x={middleX} angle={angle2} />}
+			{state <= 2 && (
+				<Container x={branchDeltaX2} y={-y} angle={angle1}>
 					<Rectangle
 						x={-margin}
 						y={-30}
@@ -51,8 +57,8 @@ export const Branch = ({ branch: { y, flipX, state, type }, onClick }) => {
 						pointerdown={onClick} />
 				</Container>
 			)}
-			{state <= 1 && (
-				<Container x={branchDeltaX3[type]} y={-y + branchDeltaY3[type]} angle={angle3}>
+			{state <= 2 && (
+				<Container x={middleX} y={middleY} angle={angle2}>
 					<Rectangle
 						x={-margin}
 						y={-30}
@@ -64,9 +70,6 @@ export const Branch = ({ branch: { y, flipX, state, type }, onClick }) => {
 						pointerdown={onClick} />
 				</Container>
 			)}
-			<Sprite texture={texture1} anchor={[0, 0.5]} y={-y} x={branchDeltaX} />
-			{state <= 3 && <Sprite texture={texture2} anchor={[0, 0.5]} y={-y} x={branchDeltaX2} angle={angle2} />}
-			{state <= 1 && <Sprite texture={texture3} anchor={[0, 0.5]} y={-y + branchDeltaY3[type]} x={branchDeltaX3[type]} angle={angle3} />}
 		</Container>
 	);
 };
@@ -79,27 +82,31 @@ export const findPosition = (branches, birds, sign = 0) => {
 	} else if (sign < 0) {
 		branches = branches.filter(branch => branch.flipX);
 	}
-	branches = branches.flatMap(branch => {
-		if (branch.state <= 1) {
-			return [{...branch, half: 0}, {...branch, half: 1}]
-		} else if (branch.state <= 3) {
-			return [{...branch, half: 0}]
-		} else {
-			return [];
-		}
-	})
+	branches = branches.filter(branch => branch.state <= 2);
 
 	let tries = 0;
 	do {
 		const branch = branches[Math.floor(Math.random() * branches.length)];
-		const startX = branch.half == 0 ? branchDeltaX2 : branchDeltaX3[branch.type];
-		const startY = branch.y - branch.half * branchDeltaY3[branch.type];
-		const angle = (branch.state == 3 - 2 * branch.half) ? -branchAngle * Math.PI/180 : 0;
-		const d = Math.random() * [branchLength2[branch.type], branchLength3[branch.type]][branch.half];
-		const x = (branch.flipX ? -1 : 1) * (startX + d * Math.cos(angle));
-		const y = startY + d * Math.sin(angle);
+		const {type, angle1, angle2, flipX} = branch;
+
+		const leftX = branchDeltaX2;
+		const leftY = -branch.y;
+
+		const middleX = leftX + branchLength2[type] * Math.cos(angle1 * Math.PI/180) - branchDeltaY3[type] * Math.sin(angle1 * Math.PI/180);
+		const middleY = leftY + branchLength2[type] * Math.sin(angle1 * Math.PI/180) + branchDeltaY3[type] * Math.cos(angle1 * Math.PI/180);
+
+		let x, y = leftY;
+		const t = Math.random();
+		if (t < 0.5) {
+			x = (flipX ? -1 : 1) * (leftX + t * 2 * Math.cos(angle1 * Math.PI/180) * branchLength2[type]);
+			y = leftY + t * 2 * Math.sin(angle1 * Math.PI/180) * branchLength2[type];
+		} else {
+			x = (flipX ? -1 : 1) * (middleX + (t - 0.5) * 2 * Math.cos(angle2 * Math.PI/180) * branchLength3[type]);
+			y = middleY + (t - 0.5) * 2 * Math.sin(angle2 * Math.PI/180) * branchLength3[type];
+		}
+
 		if (tries == 100 || birds.length == 0 || birds.every(bird => Math.pow(bird.x - x, 2) + Math.pow(bird.y - y, 2) >= birdDistanceSquared)) {
-			return {x, y, branch};
+			return {x, y: -y, branch};
 		}
 		tries++;
 	} while (tries <= 100);

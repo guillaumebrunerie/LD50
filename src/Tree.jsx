@@ -14,7 +14,7 @@ import Bird from "./Bird";
 import Beaver from "./Beaver";
 import AnimatedSprite from "./components/AnimatedSprite";
 
-const treeFactor = [0.2, 1, 5];
+const treeFactor = [0, 0, 0]; //[0.2, 1, 5];
 const aFactor = 1e-5;  // Influence of one degree
 const bFactor = 4e-5; // Influence of one bird
 const landingSpeed = 0.05; // Influence of one bird landing
@@ -114,6 +114,8 @@ const Bear = ({x, y, flipped, state, ...props}) => {
 	)
 }
 
+const getAngle = () => (Math.random() - 0.5) * 20
+
 const Tree = ({x, y, isGameOver, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
 	const [speed, setSpeedRaw] = React.useState(0);
@@ -124,12 +126,12 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		setSpeedRaw(setter);
 	};
 	const [branches, setBranches] = React.useState([
-		{id: 1, y: 300,  flipX: false, state: 0, type: "A"},
-		{id: 2, y: 450,  flipX: true,  state: 0, type: "B"},
-		{id: 3, y: 600,  flipX: false, state: 0, type: "C"},
-		{id: 4, y: 750,  flipX: true,  state: 0, type: "A"},
-		{id: 5, y: 900,  flipX: false, state: 0, type: "B"},
-		{id: 6, y: 1050, flipX: true,  state: 0, type: "C"},
+		{id: 1, y: 300,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "A"},
+		{id: 2, y: 450,  flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "B"},
+		{id: 3, y: 600,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "C"},
+		{id: 4, y: 750,  flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "A"},
+		{id: 5, y: 900,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "B"},
+		{id: 6, y: 1050, flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "C"},
 	]);
 
 	const [birds, setBirds] = React.useState([]);
@@ -137,12 +139,12 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 
 	useOnMount(() => {
 		setTimeout(() => {
-			addBird(findPosition(branches, [], 1), false);
-			addBird(findPosition(branches, [], -1), false);
+			addBird(findPosition(branches, [], 1));
+			addBird(findPosition(branches, [], -1));
 		}, 0);
 		setTimeout(() => {
-			addBird(findPosition(branches, [], 1), false);
-			addBird(findPosition(branches, [], -1), false);
+			addBird(findPosition(branches, [], 1));
+			addBird(findPosition(branches, [], -1));
 		}, 500);
 	});
 
@@ -273,7 +275,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		});
 	}
 
-	const addBird = (dest, changeSpeed = true) => {
+	const addBird = (dest) => {
 		const randomColor = () => Math.floor(Math.random() * 3) + 1;
 		const randomSize = () => ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];
 		const newBird = {
@@ -285,24 +287,38 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 			state: "flying",
 		}
 		setBirds(birds => [...birds, newBird])
-		// if (changeSpeed) {
-		// 	setSpeed(speed => bird.x < 0 ? speed - landingSpeed : speed + landingSpeed);
-		// }
 	};
 
-	const flipBird = id => () => {
-		const bird = birds.find(b => b.id === id);
+	const flipBird = bird => () => {
 		const newPosition = findPosition(branches, birds, -bird.x);
 		setBirds(birds.map(b => b === bird ? {...b, dest: newPosition, state: "flying"} : b));
 		sound.play("Chirp");
 	};
 
+	const getBranchAngle = () => {
+		return (Math.random() > 0.5 ? -1 : 1) * (30 + Math.random() * 40);
+	}
+
+	const breakBranch = branch => {
+		const angle1 = getBranchAngle();
+		const deltaAngle = Math.abs(getBranchAngle());
+		const angle2 = angle1 > 0 ? angle1 - deltaAngle : angle1 + deltaAngle;
+		switch (branch.state) {
+		case 0:
+			return {...branch, state: 1, angle2: angle1};
+		case 1:
+			return {...branch, state: 2, angle1, angle2};
+		case 2:
+			return {...branch, state: 3, angle1, angle2};
+		}
+	}
+
 	const branchSpeed = 0.2;
-	const holdBranch = (id, flipX) => () => {
+	const holdBranch = branch => () => {
 		const deltaSpeed = (0.5 + Math.random() / 2) * branchSpeed;
-		setSpeedRaw(flipX ? speed - deltaSpeed : speed + deltaSpeed);
-		setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: Math.min(branch.state + 1, 4)} : branch))
-		scareBirds(id);
+		setSpeedRaw(branch.flipX ? speed - deltaSpeed : speed + deltaSpeed);
+		setBranches(branches => branches.map(b => b === branch ? breakBranch(b) : b))
+		scareBirds(branch.id);
 	};
 
 	const beaverSpeed = 0.5;
@@ -403,27 +419,30 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		}
 	})
 
+	// const debugThings = [...new Array(100).keys()].map(() => findPosition(branches, []));
+
 	return (
 		<Container x={x} y={y}>
 			<Stump state={treeState}/>
 			<Container angle={angle}>
 				<Trunk state={treeState}/>
 				{["fallen", "grabbing", "disappearing"].includes(beeHive.state) && <Bear x={-44} y={-90} flipped={beeHive.flipped} state={beeHive.state}/>}
-				{branches.map(({id, ...branch}) => (
+				{branches.map(branch => (
 					<Branch
-						key={id}
+						key={branch.id}
 						branch={branch}
-						onClick={holdBranch(id, branch.flipX)}
+						onClick={holdBranch(branch)}
 					/>
 				))}
 				{beeHive.state === "attached" && <BeeHive x={beeHive.x} y={beeHive.y} angle={-angle} onClick={dropBeeHive}/>}
-				{birds.map(({id, ...bird}) => (
+				{birds.map(bird => (
 					<Bird
-						key={id}
+						key={bird.id}
 						bird={bird}
-						onClick={flipBird(id)}
+						onClick={flipBird(bird)}
 					/>
 				))}
+				{/*debugThings.map(({x, y}, i) => <Circle key={i} x={x} y={y}/>)*/}
 			</Container>
 			{beeHive.state !== "attached" && <BeeHive x={beeHive.x} y={beeHive.y}/>}
 			{beaverStatus.state == "chopping" && <AnimatedSprite loop={Animations.WoodShavingsLoop} anchor={0.5}/>}
