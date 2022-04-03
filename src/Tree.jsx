@@ -20,7 +20,7 @@ const bFactor = 4e-5; // Influence of one bird
 const landingSpeed = 0.05; // Influence of one bird landing
 const takeOffSpeed = -0.02; // Influence of one bird leaving
 const limitAngle = 20; // Max angle before the game is lost
-const endAcceleration = 0.015; // Acceleration when we reach the limit angle
+const endAcceleration = 0; //0.015; // Acceleration when we reach the limit angle
 const movingStrength = 0.02; // By how much the tree moves when we drag it
 const inertiaStrength = movingStrength * 10; // By how much the tree moves when we release it
 const releaseTimeout = 500; // How long we can hold a branch
@@ -133,7 +133,6 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 	]);
 
 	const [birds, setBirds] = React.useState([]);
-	const isHoldingBranch = React.useRef();
 	const [treeState, setTreeState] = React.useState({level: 1, broken: false});
 
 	useOnMount(() => {
@@ -161,10 +160,6 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 			return;
 		}
 
-		if (isHoldingBranch.current) {
-			return;
-		}
-
 		let a = angle * aFactor * treeFactor[treeState.level - 1];
 		birds.filter(b => b.state === "standing").forEach(b => {
 			if (b.x > 0) {
@@ -177,7 +172,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 			a += angle > 0 ? endAcceleration : -endAcceleration;
 		}
 		setSpeedRaw(speed => speed + a);
-		setAngle(angle => isHoldingBranch.current ? angle : angle + delta * speed);
+		setAngle(angle => angle + delta * speed);
 	});
 
 	// Main loop for flying birds
@@ -302,36 +297,13 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		sound.play("Chirp");
 	};
 
-	const timeoutRef = React.useRef();
-	const holdBranch = id => () => {
-		isHoldingBranch.current = {id};
-		setSpeedRaw(0);
-		timeoutRef.current = setTimeout(() => releaseBranch(id), releaseTimeout);
-	};
-
-	const moveBranch = (id, dx) => {
-		setAngle(angle => angle + dx * movingStrength);
-	};
-
-	const releaseBranch = (id) => {
-		clearTimeout(timeoutRef.current);
-		isHoldingBranch.current = null;
+	const branchSpeed = 0.2;
+	const holdBranch = (id, flipX) => () => {
+		const deltaSpeed = (0.5 + Math.random() / 2) * branchSpeed;
+		setSpeedRaw(flipX ? speed - deltaSpeed : speed + deltaSpeed);
 		setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: Math.min(branch.state + 1, 4)} : branch))
 		scareBirds(id);
-		const speed = getSpeed().vx * inertiaStrength;
-		setSpeedRaw(speed);
-	}
-
-	useWindowEventListener("pointermove", event => {
-		if (isHoldingBranch.current) {
-			moveBranch(isHoldingBranch.current.id, event.movementX);
-		}
-	});
-	useWindowEventListener("pointerup", () => {
-		if (isHoldingBranch.current) {
-			releaseBranch(isHoldingBranch.current.id);
-		}
-	});
+	};
 
 	const beaverSpeed = 0.5;
 	const choppingTime = 3000;
@@ -441,7 +413,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 					<Branch
 						key={id}
 						branch={branch}
-						onClick={holdBranch(id)}
+						onClick={holdBranch(id, branch.flipX)}
 					/>
 				))}
 				{beeHive.state === "attached" && <BeeHive x={beeHive.x} y={beeHive.y} angle={-angle} onClick={dropBeeHive}/>}
