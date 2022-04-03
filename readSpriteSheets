@@ -1,0 +1,12 @@
+#!/usr/bin/node
+
+const fs = require("fs");
+
+fs.readdirSync("./gfx").forEach(file => {
+	if (file.endsWith(".json")) {
+		console.log(file);
+		let rawdata = fs.readFileSync("gfx/" + file);
+		let data = JSON.parse(rawdata);
+		console.log(data["frames"].map(f => f["filename"]));
+	}
+});

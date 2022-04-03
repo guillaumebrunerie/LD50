@@ -47,6 +47,7 @@ const Tree = ({x, y, gameOver}) => {
 
 	const [birds, setBirds] = React.useState([]);
 	const isHoldingBranch = React.useRef();
+	const [treeState, setTreeState] = React.useState({level: 1, broken: false});
 
 	React.useEffect(() => {
 		addBird(findPosition(branches), false);
@@ -58,15 +59,10 @@ const Tree = ({x, y, gameOver}) => {
 
 	// Main loop
 	usePixiTicker(delta => {
-		if (angle > 90) {
-			setAngle(90);
+		if (Math.abs(angle) > 90) {
+			setAngle(90 * angle / Math.abs(angle));
 			setSpeedRaw(0);
-			gameOver();
-			return;
-		}
-		if (angle < -90) {
-			setAngle(-90);
-			setSpeedRaw(0);
+			setTreeState(state => ({...state, broken: true}));
 			gameOver();
 			return;
 		}
@@ -198,10 +194,10 @@ const Tree = ({x, y, gameOver}) => {
 	return (
 		<>
 			<Container x={x} y={y}>
-				<TrunkFloor/>
+				<TrunkFloor state={treeState}/>
 			</Container>
 			<Container angle={angle} x={x} y={y}>
-				<Trunk/>
+				<Trunk state={treeState}/>
 				{branches.map(({id, ...branch}) => (
 					<Branch
 						key={id}
