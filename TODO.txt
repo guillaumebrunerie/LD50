@@ -18,3 +18,4 @@ Graphical tasks
 - Logo
 - Some UI stuff
 - Branch hitting the ground animation
+- Font!
