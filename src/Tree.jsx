@@ -92,7 +92,7 @@ const useTicker = (callback) => {
 	}, []));
 };
 
-const Tree = ({x, y, gameOver}) => {
+const Tree = ({x, y, isGameOver, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
 	const [speed, setSpeedRaw] = React.useState(0);
 	const setSpeed = setter => {
@@ -127,11 +127,40 @@ const Tree = ({x, y, gameOver}) => {
 
 	// Main loop
 	useTicker(delta => {
+		if (isGameOver) {
+			return;
+		}
+
 		if (Math.abs(angle) >= 90) {
 			setAngle(90 * angle / Math.abs(angle));
 			setSpeedRaw(0);
 			setTreeState(state => ({...state, broken: true}));
 			gameOver();
+			return;
+		}
+
+		if (isHoldingBranch.current) {
+			return;
+		}
+
+		let a = angle * aFactor * treeFactor[treeState.level - 1];
+		birds.filter(b => b.state === "standing").forEach(b => {
+			if (b.x > 0) {
+				a += bFactor * treeFactor[treeState.level - 1];
+			} else {
+				a -= bFactor * treeFactor[treeState.level - 1];
+			}
+		});
+		if (Math.abs(angle) > limitAngle) {
+			a += angle > 0 ? endAcceleration : -endAcceleration;
+		}
+		setSpeedRaw(speed => speed + a);
+		setAngle(angle => isHoldingBranch.current ? angle : angle + delta * speed);
+	});
+
+	// Main loop for flying birds
+	useTicker(delta => {
+		if (isGameOver) {
 			return;
 		}
 
@@ -152,25 +181,7 @@ const Tree = ({x, y, gameOver}) => {
 			} else {
 				return [bird];
 			}
-		}))
-
-		if (isHoldingBranch.current) {
-			return;
-		}
-
-		let a = angle * aFactor * treeFactor[treeState.level - 1];
-		birds.filter(b => b.state === "standing").forEach(b => {
-			if (b.x > 0) {
-				a += bFactor * treeFactor[treeState.level - 1];
-			} else {
-				a -= bFactor * treeFactor[treeState.level - 1];
-			}
-		});
-		if (Math.abs(angle) > limitAngle) {
-			a += angle > 0 ? endAcceleration : -endAcceleration;
-		}
-		setSpeedRaw(speed => speed + a);
-		setAngle(angle => isHoldingBranch.current ? angle : angle + delta * speed);
+		}));
 	});
 
 	// Returns {arrived: boolean, x: number, y: number}
@@ -198,6 +209,9 @@ const Tree = ({x, y, gameOver}) => {
 	}
 
 	useInterval(() => {
+		if (isGameOver) {
+			return;
+		}
 		const newBird = Math.random() < birdProbabilities[birds.length]["in"];
 		const birdLeaves = Math.random() < birdProbabilities[birds.length]["out"];
 		if (birdLeaves) {
@@ -301,16 +315,18 @@ const Tree = ({x, y, gameOver}) => {
 
 	useTicker(() => {
 		const deltaMS = PIXI.Ticker.shared.deltaMS;
-		if (beaverStatus.timeout > deltaMS) {
+		if (!isGameOver && beaverStatus.timeout > deltaMS) {
 			setBeaverStatus({...beaverStatus, timeout: beaverStatus.timeout - deltaMS});
 		} else {
 			switch (beaverStatus.state) {
 			case "hidden": {
-				setBeaverStatus({...beaverStatus, state: "arriving", x: 500, y: 60, dest: {x: 120, y: 60}, timeout: 0});
+				if (!isGameOver) {
+					setBeaverStatus({...beaverStatus, state: "arriving", x: 500, y: 60, dest: {x: 120, y: 60}, timeout: 0});
+				}
 				break;
 			}
 			case "chopping": {
-				if (treeState.level < 3) {
+				if (!isGameOver && treeState.level < 3) {
 					setTreeState({...treeState, level: treeState.level + 1});
 				}
 				setBeaverStatus({...beaverStatus, state: "leaving", dest: {x: -500, y: 60}, timeout: 0});

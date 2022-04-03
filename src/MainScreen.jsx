@@ -49,7 +49,7 @@ const MainScreen = () => {
 
 	return (
 		<Container>
-			<Tree key={attempt} gameOver={gameOver} x={360} y={1280 - 115}/>
+			<Tree key={attempt} isGameOver={isGameOver} gameOver={gameOver} x={360} y={1280 - 115}/>
 			{isGameOver && <Text x={10} y={10} text={"Game over"}/>}
 			{isGameOver && lastScore > 0 && <Text x={10} y={40} text={`You lasted ${lastScore} seconds\nHigh score: ${highScore} seconds`}/>}
 			{isGameOver && <StartButton onClick={newGame}/>}
