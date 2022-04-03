@@ -115,7 +115,7 @@ const Tree = ({x, y, gameOver}) => {
 
 	// Main loop
 	usePixiTicker(delta => {
-		if (Math.abs(angle) > 90) {
+		if (Math.abs(angle) >= 90) {
 			setAngle(90 * angle / Math.abs(angle));
 			setSpeedRaw(0);
 			setTreeState(state => ({...state, broken: true}));
@@ -183,7 +183,7 @@ const Tree = ({x, y, gameOver}) => {
 	const flyBird = (bird, delta) => {
 		const {arrived, x, y} = move(bird, bird.dest, delta, birdSpeed);
 		if (arrived) {
-			return {...bird, x, y, state: "standing"};
+			return {...bird, x, y, branch: bird.dest.branch, state: "standing"};
 		} else {
 			return {...bird, x, y};
 		}
@@ -193,7 +193,7 @@ const Tree = ({x, y, gameOver}) => {
 		const newBird = Math.random() < birdProbabilities[birds.length]["in"];
 		const birdLeaves = Math.random() < birdProbabilities[birds.length]["out"];
 		if (birdLeaves) {
-			removeBird();
+			removeRandomBird();
 		}
 		if (newBird) {
 			addBird(findPosition(branches, birds));
@@ -205,16 +205,32 @@ const Tree = ({x, y, gameOver}) => {
 		y: Math.random() * 1000,
 	});
 
-	const removeBird = () => {
+	const removeRandomBird = () => {
+		const standingBirds = birds.filter(bird => bird.state == "standing");
+		if (standingBirds.length == 0) {
+			return;
+		}
+		const index = Math.floor(Math.random() * standingBirds.length);
+		removeBird(standingBirds[index]);
+	}
+
+	const removeBird = (bird) => {
 		setBirds(birds => {
-			const index = Math.floor(Math.random() * birds.length);
 			const deltaSpeed = takeOffSpeed * treeFactor[treeState.level - 1];
-			setSpeed(speed => birds[index].x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
-			return birds.map(b => b === birds[index] ? {...b, state: "leaving", dest: randomDestination()} : b);
+			setSpeed(speed => bird.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
+			return birds.map(b => b === bird ? {...b, state: "leaving", dest: randomDestination()} : b);
 		});
 	}
 
-	const addBird = (bird, changeSpeed = true) => {
+	const scareBirds = (branchId) => {
+		birds.forEach(bird => {
+			if (bird.branch && bird.branch.id === branchId) {
+				removeBird(bird);
+			}
+		});
+	}
+
+	const addBird = (dest, changeSpeed = true) => {
 		const randomColor = () => Math.floor(Math.random() * 3) + 1;
 		const randomSize = () => ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];
 		const newBird = {
@@ -222,7 +238,7 @@ const Tree = ({x, y, gameOver}) => {
 			color: randomColor(),
 			size: randomSize(),
 			...randomDestination(),
-			dest: bird,
+			dest,
 			state: "flying",
 		}
 		setBirds(birds => [...birds, newBird])
@@ -235,7 +251,6 @@ const Tree = ({x, y, gameOver}) => {
 		const bird = birds.find(b => b.id === id);
 		const newPosition = findPosition(branches, birds, -bird.x);
 		setBirds(birds.map(b => b === bird ? {...b, dest: newPosition, state: "flying"} : b));
-
 		sound.play("Chirp");
 	};
 
@@ -254,6 +269,7 @@ const Tree = ({x, y, gameOver}) => {
 		clearTimeout(timeoutRef.current);
 		isHoldingBranch.current = null;
 		setBranches(branches => branches.map(branch => branch.id === id ? {...branch, state: Math.min(branch.state + 1, 4)} : branch))
+		scareBirds(id);
 		const speed = getSpeed().vx * inertiaStrength;
 		setSpeedRaw(speed);
 	}

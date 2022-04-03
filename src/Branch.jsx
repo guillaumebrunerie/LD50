@@ -99,9 +99,8 @@ export const findPosition = (branches, birds, sign = 0) => {
 		const x = (branch.flipX ? -1 : 1) * (startX + d * Math.cos(angle));
 		const y = startY + d * Math.sin(angle);
 		if (tries == 100 || birds.length == 0 || birds.every(bird => Math.pow(bird.x - x, 2) + Math.pow(bird.y - y, 2) >= birdDistanceSquared)) {
-			return {x, y};
+			return {x, y, branch};
 		}
 		tries++;
 	} while (tries <= 100);
-	return {x: 0, y: 0};
 };
