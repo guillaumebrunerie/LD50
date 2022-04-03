@@ -348,9 +348,10 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 				setBeaverStatus({...beaverStatus, state: "leaving", dest: {x: -500, y: beaverY}, timeout: 0});
 				break;
 			}
+			case "scared":
 			case "leaving":
 			case "arriving": {
-				const {arrived, x, y} = move(beaverStatus, beaverStatus.dest, deltaMS, beaverSpeed);
+				const {arrived, x, y} = move(beaverStatus, beaverStatus.dest, deltaMS, beaverStatus.state == "scared" ? 3 * beaverSpeed : beaverSpeed);
 				if (arrived) {
 					const state = beaverStatus.state == "arriving" ? "chopping" : "hidden";
 					const timeout = beaverStatus.state == "arriving" ? choppingTime : waitingTime;
@@ -372,7 +373,7 @@ const Tree = ({x, y, isGameOver, gameOver}) => {
 		case "chopping":
 		case "leaving":
 		case "arriving":
-			setBeaverStatus({...beaverStatus, state: "leaving", dest: {x: 500, y: beaverY}, timeout: 0});
+			setBeaverStatus({...beaverStatus, state: "scared", dest: {x: -500, y: beaverY}, timeout: 0});
 			break;
 		}
 	}

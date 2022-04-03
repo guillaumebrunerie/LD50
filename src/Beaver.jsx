@@ -8,7 +8,7 @@ const Beaver = ({ beaver: {x, y, state}, onClick }) => {
 
 	if (state == "arriving") {
 		loop = Animations.BeaverRun;
-	} else if (state === "leaving") {
+	} else if (state === "leaving" || state === "scared") {
 		// start = Animations.BeaverTransition;
 		loop = Animations.BeaverRun;
 	} else if (state === "chopping") {
