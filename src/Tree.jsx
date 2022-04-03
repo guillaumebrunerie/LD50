@@ -346,7 +346,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			const angle2 = branch.angle2 + (branch.flipX ? -1 : 1) * angle;
 			return [
 				{...branch, state: 3},
-				{...branch, x, y, dropping: true, state: 3, angle1, angle2, speed: 3}
+				{...branch, id: branch.id + 100, x, y, dropping: true, state: 3, angle1, angle2, speed: 3}
 			];
 		}
 		}
@@ -371,8 +371,18 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const holdBranch = branch => () => {
 		const deltaSpeed = (0.5 + Math.random() / 2) * branchSpeed;
 		setSpeedRaw(branch.flipX ? speed - deltaSpeed : speed + deltaSpeed);
-		setBranches(branches.flatMap(b => b === branch ? breakBranch(b) : [b]))
+		const brokenBranches = breakBranch(branch);
+		setBranches(branches.flatMap(b => b === branch ? brokenBranches : [b]))
 		scareBirds(branch.id);
+
+		// Reposition bee hive
+		if (branch.id === 1 && beeHive.state === "attached") {
+			if (brokenBranches.length == 1) {
+				reAttachBeeHive(brokenBranches[0]);
+			} else {
+				dropBeeHive();
+			}
+		}
 	};
 
 	const beaverSpeed = 0.5;
@@ -433,7 +443,13 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	}
 
 	const beeHiveAcceleration = 0.5;
-	const [beeHive, setBeeHive] = React.useState({state: "attached", x: 150, y: -300, speed: 0, timeout: 0, angle: 0,});
+	const [beeHive, setBeeHive] = React.useState({state: "attached", x: 150, y: -300, speed: 0, timeout: 0, angle: 0});
+
+	const reAttachBeeHive = branch => {
+		const a = branch.angle1 * Math.PI/180;
+		const distance = 100;
+		setBeeHive({...beeHive, x: branch.x + Math.cos(a) * distance, y: branch.y + Math.sin(a) * distance})
+	}
 
 	const dropBeeHive = () => {
 		const a = angle * Math.PI/180;
