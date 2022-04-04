@@ -1,21 +1,25 @@
 Programming tasks
 -----------------
 
-- Birds sometimes land on non-existing branches
-- Birds sometimes land on top of each other
+X Birds sometimes land on non-existing branches
+- Bird should arrive and fly away from/to above
 - Timer keeps counting when game is paused
-- Birds should fly away on game over
-- The bear should not appear if we lost already
-- Birds should fly away on the outside
 - Ease for moving between levels
 - Ease for tree falling
-- Beaver on a random side
-- Birds should arrive from above and on the same side
-- Birds should leave to the same side
-- One click on a branch drops it
 - Correct initial position of beehive
-- Better behavior for owl
-- Fix CSS and check that it works on itch.io
+X Check that it works on itch.io
+- Tweak the arriving/leaving behaviour (a bit more birds, a bit more random)
+
+Done:
+
+X Beaver on a random side
+X Birds should arrive and fly away from/to the outside
+X The bear should not appear if we lost already
+X One click on a branch drops it
+X Fix CSS
+X Birds sometimes land on top of each other
+X Better behavior for owl
+X Birds should fly away on game over
 
 Graphical tasks
 ---------------
