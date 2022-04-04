@@ -49,7 +49,7 @@ const endY = -52;
 const treeCoronaY = -775;
 
 const Stump = ({state: {level, broken}}) => {
-	const endTexture = Textures.Tree.get("TreeEnd_0" + level + (broken ? "_Broken" : ""));
+	const endTexture = Textures.Tree.get("TreeEnd_0" + level + ((broken && level <= 2) ? "_Broken" : ""));
 	return (
 		<>
 			<Sprite texture={Textures.Tree.get("Trunk")} anchor={[0.5, 0]} y={stumpY} />
@@ -86,7 +86,7 @@ const Owl = ({owl, onClick}) => {
 }
 
 const Trunk = ({state: {level, broken}}) => {
-	const endTexture = Textures.Tree.get("TreeEnd_0" + level + (broken ? "_Broken" : ""));
+	const endTexture = Textures.Tree.get("TreeEnd_0" + level + ((broken && level <= 2) ? "_Broken" : ""));
 
 	return (
 		<>
