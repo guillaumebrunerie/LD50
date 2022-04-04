@@ -6,6 +6,7 @@ Programming tasks
 - Timer keeps counting when game is paused
 - Tree behavior needs tweaking
 - Birds should fly away on game over
+- The bear should not appear if we lost already
 
 
 Graphical tasks

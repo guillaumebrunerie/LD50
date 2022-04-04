@@ -59,7 +59,8 @@ const MainScreen = () => {
 	return (
 		<Container>
 			<Sprite texture={Textures.Bg} x={0} y={0}/>
-			<Sprite texture={Textures.BgGround} anchor={[0, 1]} x={0} y={1280}/>
+			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={previousTreeX} y={1280}/>
+			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={treeX} y={1280}/>
 			<Tree key={attempt - 1} isGameOver={true} gameOver={() => {}} x={previousTreeX} y={1280 - 115}/>
 			<Tree key={attempt} isFirstScreen={attempt == 0} isGameOver={isGameOver} gameOver={gameOver} x={treeX} y={1280 - 115}/>
 			{!isGameOver && <Text x={10} y={10} text={`Score: ${((Date.now() - startTime) / 1000).toFixed(1)} seconds`}/>}

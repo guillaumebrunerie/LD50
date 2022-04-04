@@ -14,11 +14,13 @@ import AnimatedSprite from "./components/AnimatedSprite";
 
 const treeFactor = [0.3, 1, 3];
 const birdFactor = {"Small": 0.3, "Medium": 1, "Big": 3};
+const birdSize = {"Small": 1, "Medium": 2, "Big": 3};
+const birdSpeedFactor = [0.01, 0.04, 0.07];
 const aFactor = 2e-5;  // Influence of one degree
 const bFactor = 4e-5; // Influence of one bird
 const landingSpeed = 0.05; // Influence of one bird landing
 const takeOffSpeed = -0.02; // Influence of one bird leaving
-const limitAngle = 20; // Max angle before the game is lost
+const limitAngle = 25; // Max angle before the game is lost
 const endAcceleration = 0; //0.015; // Acceleration when we reach the limit angle
 const birdSpeed = 10;
 const birdProbabilities = [
@@ -187,6 +189,25 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		acceleration += angle > 0 ? endAcceleration : -endAcceleration;
 	}
 
+	let newSpeed = 0;
+	birds.filter(b => b.state === "standing").forEach(b => {
+		if (b.x > 0) {
+			newSpeed += birdSize[b.size];
+		} else {
+			newSpeed -= birdSize[b.size];
+		}
+	});
+	if (newSpeed == 0 && angle !== 0) {
+		newSpeed = angle / Math.abs(angle);
+	}
+	const fallingSpeed = 1 / birdSpeedFactor[treeState.level - 1];
+	if (angle > limitAngle) {
+		newSpeed = Math.max(newSpeed, fallingSpeed);
+	}
+	if (angle < -limitAngle) {
+		newSpeed = Math.min(newSpeed, -fallingSpeed);
+	}
+
 	// "Main loop"
 	useTicker(delta => {
 		if (isGameOver) {
@@ -201,7 +222,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			return;
 		}
 
-		setSpeedRaw(speed + acceleration);
+		setSpeedRaw(newSpeed * birdSpeedFactor[treeState.level - 1]);
 		setAngle(angle + delta * speed);
 	});
 
@@ -216,7 +237,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				const result = flyBird(bird, delta);
 				if (result.state == "standing") {
 					const deltaSpeed = landingSpeed * treeFactor[treeState.level - 1] * birdFactor[bird.size];
-					setSpeed(speed => result.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
+					// setSpeed(speed => result.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
 				}
 				return [result];
 			} else if (bird.state === "leaving") {
@@ -291,7 +312,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const removeBird = (bird) => {
 		setBirds(birds => {
 			const deltaSpeed = takeOffSpeed * treeFactor[treeState.level - 1] * birdFactor[bird.size];
-			setSpeed(speed => bird.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
+			// setSpeed(speed => bird.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
 			return birds.map(b => b === bird ? {...b, state: "leaving", dest: randomDestination()} : b);
 		});
 	}
@@ -379,7 +400,8 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const branchSpeed = 0.2;
 	const holdBranch = branch => () => {
 		const deltaSpeed = (0.5 + Math.random() / 2) * branchSpeed;
-		setSpeedRaw(branch.flipX ? speed - deltaSpeed : speed + deltaSpeed);
+		// setAngle(branch.flipX ? angle - 5 : angle + 5);
+		// setSpeedRaw(branch.flipX ? speed - deltaSpeed : speed + deltaSpeed);
 		const brokenBranches = breakBranch(branch);
 		setBranches(branches.flatMap(b => b === branch ? brokenBranches : [b]))
 		scareBirds(branch.id);
