@@ -9,11 +9,9 @@ export const TextureData = {
 
 	"Font": "font.json",
 	"Tree": "tree.json",
-	"Owl": "Owl.png",
 	"OwlIdle": "Owl_Idle.json",
 	"BeeHive": "BeeHive.png",
 	"BeeHiveLoop": "BeeHive_Loop.png",
-	"Bear": "Bear.png",
 	"WoodShavingsLoop": {
 		file: "WoodShavingsLoop.json",
 		fps: 10,
