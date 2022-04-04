@@ -1,14 +1,13 @@
 Programming tasks
 -----------------
 
+X Birds should come from the side/above no matter the angle of the tree
+X Add music and music button
 X Ease for tree falling
-- Check if I can preload sounds
-- Add music and music button
-- Have the tree fall faster if there is no branch on one side
+X Have the tree fall faster if there is no branch on one side
 
-Wishlist:
-- Birds should come from the side/above no matter the angle of the tree
 - Clicking owl when one side has no branches makes a lot of bird fly by
+- Check if I can preload sounds
 
 Done:
 

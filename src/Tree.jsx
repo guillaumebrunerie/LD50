@@ -276,10 +276,12 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		}
 	}, 1000);
 
-	const randomDestination = (dir) => ({
-		x: dir * 500,
-		y: -800 - 400 * Math.random(),
-	});
+	const randomDestination = (dir) => {
+		const a = angle * Math.PI/180;
+		const x = dir * 500;
+		const y = -800 - 400 * Math.random();
+		return {x: x * Math.cos(a) + y * Math.sin(a), y: - x * Math.sin(a) + y * Math.cos(a) }
+	};
 
 	const scareAllBirds = () => {
 		birds.forEach(bird => removeBird(bird));
@@ -568,7 +570,10 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		[...new Array(5).keys()].forEach(() => addBird(undefined, true));
 	}
 
-	const debugThings = [...new Array(0).keys()].map(() => findPosition(branches, []));
+	// const debugThings = [...new Array(0).keys()].map(() => findPosition(branches, []));
+	// const debugThings2 = [...new Array(10).keys()].map(() => randomDestination2(1));
+	// const debugThings3 = [...new Array(10).keys()].map(() => randomDestination2(-1));
+
 
 	return (
 		<Container x={x} y={y} scale={0.9}>
@@ -591,10 +596,13 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 						key={bird.id}
 						bird={bird}
 						onClick={flipBird(bird)}
+						angle={-angle}
 					/>
 				))}
 				<TreeFront/>
-				{debugThings.map(({x, y}, i) => <Circle key={i} x={x} y={y}/>)}
+				{/*debugThings.map(({x, y}, i) => <Circle key={i} x={x} y={y}/>)*/}
+				{/*debugThings2.map(({x, y}, i) => <Circle key={i} x={x} y={y}/>)*/}
+				{/*debugThings3.map(({x, y}, i) => <Circle key={i} x={x} y={y}/>)*/}
 			</Container>
 			{beeHive.state !== "attached" && <BeeHive beeHive={beeHive} active={false}/>}
 			{branches.filter(b => b.dropping).map(branch => (
