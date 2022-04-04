@@ -291,8 +291,8 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		}
 	}, 1000);
 
-	const randomDestination = () => ({
-		x: Math.random() > 0.5 ? -400 : 400,
+	const randomDestination = (dir) => ({
+		x: dir * 400,
 		y: -Math.random() * 1000,
 	});
 
@@ -313,7 +313,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		setBirds(birds => {
 			const deltaSpeed = takeOffSpeed * treeFactor[treeState.level - 1] * birdFactor[bird.size];
 			// setSpeed(speed => bird.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
-			return birds.map(b => b === bird ? {...b, state: "leaving", dest: randomDestination()} : b);
+			return birds.map(b => b === bird ? {...b, state: "leaving", dest: randomDestination(b.x / Math.abs(b.x))} : b);
 		});
 	}
 
@@ -335,7 +335,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			id: Math.random(),
 			color: randomColor(),
 			size: randomSize(),
-			...randomDestination(),
+			...randomDestination(dest.x / Math.abs(dest.x)),
 			dest,
 			state: "flying",
 		}
