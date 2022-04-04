@@ -277,8 +277,8 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	}, 1000);
 
 	const randomDestination = (dir) => ({
-		x: dir * 400,
-		y: -Math.random() * 1000,
+		x: dir * 500,
+		y: -800 - 400 * Math.random(),
 	});
 
 	const scareAllBirds = () => {

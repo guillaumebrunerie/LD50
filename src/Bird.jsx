@@ -8,6 +8,17 @@ import Circle from "./components/Circle";
 const anchorY = 0.75;
 
 const Bird = ({ bird: { state, x, y, size, color, branch }, onClick }) => {
+	const hitboxSize = {
+		"Small": 50,
+		"Medium": 60,
+		"Big": 65,
+	}[size];
+	const hitboxOffsetY = {
+		"Small": 40,
+		"Medium": 55,
+		"Big": 45,
+	}[size];
+
 	if (state === "flying" || state === "leaving") {
 		return (
 			<AnimatedSprite loop={Animations[`Bird_${size}_FlyingLoop`]} anchor={[0.5, anchorY]} x={x} y={y} interactive buttonMode pointerdown={onClick} />
@@ -17,7 +28,7 @@ const Bird = ({ bird: { state, x, y, size, color, branch }, onClick }) => {
 		return (
 			<>
 				<AnimatedSprite start={Animations[`Bird_${size}_Land`]} loop={loop} anchor={[0.5, anchorY]} x={x} y={y}/>
-				<Circle x={x} y={y - 30} alpha={0.001} radius={50} interactive buttonMode pointerdown={onClick}/>
+				<Circle x={x} y={y - hitboxOffsetY} alpha={0.001} radius={hitboxSize} interactive buttonMode pointerdown={onClick}/>
 			</>
 		);
 		// <Text text={branch.id + " " + branch.half} x={x} y={-y}/>
