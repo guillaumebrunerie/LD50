@@ -293,7 +293,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		}
 		const data = birdProbabilities[birds.length]
 		const newBird = data ? Math.random() < data["in"] : 0;
-		const birdLeaves = data ? Math.random() < data["out"] : 0;
+		const birdLeaves = data ? Math.random() < data["out"] : 1;
 		if (birdLeaves) {
 			removeRandomBird();
 		}
@@ -336,8 +336,20 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		});
 	}
 
-	const addBird = (side) => {
+	const addBird = (side, pickBestSide = false) => {
 		setBirds(birds => {
+			if (pickBestSide) {
+				const leftWeight = birds.filter(b => b.x < 0).reduce((total, bird) => total + birdSize[bird.size], 0);
+				const rightWeight = birds.filter(b => b.x > 0).reduce((total, bird) => total + birdSize[bird.size], 0);
+				if (leftWeight > rightWeight) {
+					side = 1;
+				} else if (leftWeight < rightWeight) {
+					side = -1;
+				} else {
+					side = undefined;
+				}
+			}
+
 			const dest = findPosition(branches, birds, side)
 			if (!dest) {
 				return;
@@ -568,21 +580,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const owlTrigger = () => {
 		setOwl({state: "hidden"});
 
-		const leftBirds = birds.filter(bird => bird.x < 0).length;
-		const rightBirds = birds.filter(bird => bird.x > 0).length;
-		// This is the desired left - right
-		const goal = angle > 20 ? 2 : angle > 10 ? 1 : angle > -10 ? 0 : angle > -20 ? -1 : -2;
-		const currentValue = leftBirds - rightBirds;
-		const signedBirdsToAddLeft = goal - currentValue;
-		const birdsToAddLeft = Math.ceil(Math.min(Math.max((4 + signedBirdsToAddLeft) / 2, 0), 4));
-		const birdsToAddRight = Math.ceil(Math.min(Math.max((4 - signedBirdsToAddLeft) / 2, 0), 4));
-		// Add 4 or 5 birds to try to reach an equilibrium
-		[...new Array(birdsToAddLeft).keys()].forEach(() => {
-			setTimeout(() => addBird(-1))
-		});
-		[...new Array(birdsToAddRight).keys()].forEach(() => {
-			setTimeout(() => addBird(1))
-		});
+		[...new Array(5).keys()].forEach(() => addBird(undefined, true));
 	}
 
 	const debugThings = [...new Array(0).keys()].map(() => findPosition(branches, []));
