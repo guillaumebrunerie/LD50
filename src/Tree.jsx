@@ -250,7 +250,12 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const flyBird = (bird, delta) => {
 		const {arrived, x, y} = move(bird, bird.dest, delta, birdSpeed);
 		if (arrived) {
-			return {...bird, x, y, branch: bird.dest.branch, state: "standing"};
+			if (bird.dest.branch && !branches.some(b => b.id === bird.dest.branch.id && b.state == 0)) {
+				removeBird(bird);
+				return bird;
+			} else {
+				return {...bird, x, y, branch: bird.dest.branch, state: "standing"};
+			}
 		} else {
 			return {...bird, x, y};
 		}
@@ -407,7 +412,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		scareBirds(branch.id);
 		sound.play("BranchBreaks");
 
-		if (branch.id === 1 && beeHive.state === "attached") {
+		if (branch.id === 2 && beeHive.state === "attached") {
 			dropBeeHive();
 		}
 	}
