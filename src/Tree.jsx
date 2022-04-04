@@ -46,6 +46,7 @@ const treeY = -37;
 const backgroundY = -830;
 const owlY = -820;
 const endY = -52;
+const treeCoronaY = -775;
 
 const Stump = ({state: {level, broken}}) => {
 	const endTexture = Textures.Tree.get("TreeEnd_0" + level + (broken ? "_Broken" : ""));
@@ -60,8 +61,16 @@ const Stump = ({state: {level, broken}}) => {
 const TrunkBack = () => {
 	return (
 		<>
-			<Circle x={0} y={-900} radius={700} fill={0x00AA00} />
+			<Sprite texture={Textures.TreeCoronaBack} anchor={0.5} x={0} y={treeCoronaY}/>
 			<Sprite texture={Textures.Tree.get("TreeBack")} anchor={0.5} y={backgroundY} />
+		</>
+	)
+}
+
+const TreeFront = () => {
+	return (
+		<>
+			<Sprite texture={Textures.TreeCoronaFront} anchor={0.5} x={0} y={treeCoronaY}/>
 		</>
 	)
 }
@@ -539,6 +548,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 						onClick={flipBird(bird)}
 					/>
 				))}
+				<TreeFront/>
 				{debugThings.map(({x, y}, i) => <Circle key={i} x={x} y={y}/>)}
 			</Container>
 			{beeHive.state !== "attached" && <BeeHive x={beeHive.x} y={beeHive.y}/>}
