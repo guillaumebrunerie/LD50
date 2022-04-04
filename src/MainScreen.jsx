@@ -76,9 +76,10 @@ const MainScreen = () => {
 	const {t, reset} = useLocalTime();
 	const levelSwitchDuration = 1000;
 	const levelDistance = 2500;
-	const levelSpeed = (levelDistance - 360) / levelSwitchDuration;
-	const previousTreeX = attempt == 0 ? -Infinity : 360 - t * levelSpeed;
-	const treeX = attempt == 0 ? 360 : Math.max(levelDistance - t * levelSpeed, 360)
+	const ease = t => (1 - Math.cos(t * Math.PI)) / 2;
+	const movingTreeX = levelDistance * (1 - ease(t / levelSwitchDuration));
+	const treeX = 360 + ((t <= levelSwitchDuration && attempt > 0) ? movingTreeX : 0);
+	const previousTreeX = treeX - levelDistance;
 
 	const score = isGameOver ? `${lastScore}` : `${((Date.now() - startTime) / 1000).toFixed(1)}`
 
