@@ -3,6 +3,7 @@ Programming tasks
 
 X Ease for tree falling
 X Have the tree fall faster if there is no branch on one side
+- Make branches fall much faster
 
 - Clicking owl when one side has no branches makes birds fly across the screen
 - Preload sounds
@@ -33,13 +34,14 @@ X Birds should come from the side/above no matter the angle of the tree
 Graphical tasks
 ---------------
 
-- Background + tree
+Animations:
 - Owl animation
-- Bee hive breaking animation
 - Bear animations
 - Tree breaking animation (flash at the base when the tree falls)
-- Start/game over screen
-- Logo
-- Some UI stuff
 - Branch hitting the ground animation
-- Font!
+
+Assets:
+- Background + tree
+- Logo
+- Sound button
+- Design of start/gameover screen

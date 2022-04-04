@@ -12,7 +12,9 @@ import Bird from "./Bird";
 import Beaver from "./Beaver";
 import AnimatedSprite from "./components/AnimatedSprite";
 
-const birdSize = {"Small": 1, "Medium": 2, "Big": 3};
+const branchWeight = 2;
+const beeHiveWeight = 2;
+const birdWeight = {"Small": 1, "Medium": 2, "Big": 3};
 const birdSpeedFactor = [0.01, 0.04, 0.07];
 const limitAngle = 25; // Max angle before the game is lost
 const birdSpeed = 15;
@@ -166,33 +168,39 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			setBeeHive({state: "gone", y: -2000});
 		} else {
 			setTimeout(() => {
-				addBird(1);
-				addBird(-1);
+				addBird(undefined, true);
+				addBird(undefined, true);
 			}, 1000);
 			setTimeout(() => {
-				addBird(1);
-				addBird(-1);
+				addBird(undefined, true);
+				addBird(undefined, true);
 			}, 1500);
 		}
 	});
 
-	let newSpeed = 0;
-	birds.filter(b => b.state === "standing").forEach(b => {
-		if (b.x > 0) {
-			newSpeed += birdSize[b.size];
-		} else {
-			newSpeed -= birdSize[b.size];
+	const currentWeight = () => {
+		let weight = 0;
+		// Birds weight
+		birds.filter(b => b.state === "standing").forEach(b => {
+			if (b.x > 0) {
+				weight += birdWeight[b.size];
+			} else {
+				weight -= birdWeight[b.size];
+			}
+		});
+		// Branch weight
+		branches.filter(b => b.state === 0).forEach(branch => {
+			if (branch.flipX) {
+				weight -= branchWeight;
+			} else {
+				weight += branchWeight;
+			}
+		})
+		// Hive weight
+		if (beeHive.state === "attached") {
+			weight -= beeHiveWeight;
 		}
-	});
-	if (newSpeed == 0 && angle !== 0) {
-		newSpeed = angle / Math.abs(angle);
-	}
-	const fallingSpeed = 1 / birdSpeedFactor[treeState.level - 1];
-	if (angle > limitAngle) {
-		newSpeed = Math.max(newSpeed, fallingSpeed);
-	}
-	if (angle < -limitAngle) {
-		newSpeed = Math.min(newSpeed, -fallingSpeed);
+		return weight;
 	}
 
 	// "Main loop"
@@ -208,6 +216,19 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			scareAllBirds();
 			gameOver();
 			return;
+		}
+
+		let newSpeed = currentWeight();
+		// Make sure the tree is always moving
+		if (newSpeed == 0 && angle !== 0) {
+			newSpeed = angle / Math.abs(angle);
+		}
+		const fallingSpeed = 1 / birdSpeedFactor[treeState.level - 1];
+		if (angle > limitAngle) {
+			newSpeed = Math.max(newSpeed, fallingSpeed);
+		}
+		if (angle < -limitAngle) {
+			newSpeed = Math.min(newSpeed, -fallingSpeed);
 		}
 
 		setSpeedRaw(newSpeed * birdSpeedFactor[treeState.level - 1]);
@@ -313,11 +334,10 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const addBird = (side, pickBestSide = false) => {
 		setBirds(birds => {
 			if (pickBestSide) {
-				const leftWeight = birds.filter(b => b.x < 0).reduce((total, bird) => total + birdSize[bird.size], 0);
-				const rightWeight = birds.filter(b => b.x > 0).reduce((total, bird) => total + birdSize[bird.size], 0);
-				if (leftWeight > rightWeight) {
+				const weight = currentWeight();
+				if (weight < 0) {
 					side = 1;
-				} else if (leftWeight < rightWeight) {
+				} else if (weight > 0) {
 					side = -1;
 				} else {
 					side = undefined;
