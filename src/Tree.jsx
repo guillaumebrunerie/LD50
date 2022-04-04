@@ -324,7 +324,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 
 			const dest = findPosition(branches, birds, side)
 			if (!dest) {
-				return;
+				return birds;
 			}
 			const randomColor = () => Math.floor(Math.random() * 3) + 1;
 			const randomSize = () => ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];

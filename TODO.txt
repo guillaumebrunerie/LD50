@@ -4,9 +4,11 @@ Programming tasks
 X Birds sometimes land on non-existing branches
 - Timer keeps counting when game is paused
 - Ease for tree falling
-X Fix crash when clicking owl and there is no space
 - Add sound triggers
 - Check if I can preload sounds
+
+Wishlist:
+- Clicking owl when one side has no branches makes a lot of bird fly by
 
 Done:
 
@@ -24,6 +26,7 @@ X Correct initial position of beehive
 X Tweak the arriving/leaving behaviour (a bit more birds, a bit more random)
 X Fix hit boxes of birds
 X Bird should arrive and fly away from/to above
+X Fix crash when clicking owl and there is no space
 
 Graphical tasks
 ---------------
