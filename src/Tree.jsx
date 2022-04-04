@@ -117,28 +117,54 @@ const BeeHive = ({beeHive: {state, x, y}, active, onClick, ...props}) => {
 	}
 }
 
-const bearAppearDuration = 300;
-const bearStraightenDuration = 700;
-const bearDisappearDuration = 300;
+const bearGrabFrame = 9;
+const bearReleaseFrame = 18;
+const bearFps = 15;
 
-const Bear = ({x, y, flipped, state, ...props}) => {
-	const {t} = useLocalTime();
-	const mask = React.useRef();
-	const angle = {
-		"fallen": 35 * Math.max(1 - t / bearAppearDuration, 0),
-		"grabbing": 0,
-		"disappearing": 35 * Math.max((t - bearAppearDuration - bearStraightenDuration) / bearDisappearDuration, 0),
-	}[state];
+const bearAppearDuration = bearGrabFrame * 1000 / bearFps; //300;
+const bearStraightenDuration = (bearReleaseFrame - bearGrabFrame) * 1000 / bearFps; //700);
+const bearDisappearDuration = (25 - bearReleaseFrame) * 1000 / bearFps; //300);
 
+const BearBack = ({flipped, state, ...props}) => {
 	return (
-		<Container scale={[flipped ? -1 : 1, 1]}>
-			<Sprite texture={Textures.Bear} anchor={[1, 1]} angle={angle} mask={mask.current}
-					x={x} y={y}
-					{...props}/>
-			<Rectangle ref={mask} x={x - 300} y={y - 700} width={300} height={700}/>
-		</Container>
+		<AnimatedSprite
+			start={Animations["TheBear_Back"]}
+			anchor={[0.5, 0.5]}
+			scale={[flipped ? -1 : 1, 1]}
+			{...props}
+		/>
 	)
 }
+
+const BearFront = ({flipped, state, ...props}) => {
+	return (
+		<AnimatedSprite
+			start={Animations["TheBear_Front"]}
+			anchor={[0.5, 0.5]}
+			scale={[flipped ? -1 : 1, 1]}
+			{...props}
+		/>
+	)
+}
+
+// const Bear = ({x, y, flipped, state, ...props}) => {
+// 	const {t} = useLocalTime();
+// 	const mask = React.useRef();
+// 	const angle = {
+// 		"fallen": 35 * Math.max(1 - t / bearAppearDuration, 0),
+// 		"grabbing": 0,
+// 		"disappearing": 35 * Math.max((t - bearAppearDuration - bearStraightenDuration) / bearDisappearDuration, 0),
+// 	}[state];
+
+// 	return (
+// 		<Container scale={[flipped ? -1 : 1, 1]}>
+// 			<AnimatedSprite start={Animations["TheBear_Back"]} anchor={[1, 1]} angle={angle} mask={mask.current}
+// 					x={x} y={y}
+// 					{...props}/>
+// 			<Rectangle ref={mask} x={x - 300} y={y - 700} width={300} height={700}/>
+// 		</Container>
+// 	)
+// }
 
 const getBranchAngles = () => {
 	const getAngle = () => (Math.random() > 0.5 ? -1 : 1) * (20 + Math.random() * 30);
@@ -602,6 +628,8 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	// const debugThings2 = [...new Array(10).keys()].map(() => randomDestination2(1));
 	// const debugThings3 = [...new Array(10).keys()].map(() => randomDestination2(-1));
 
+//
+	const showBear = ["fallen", "grabbing", "disappearing"].includes(beeHive.state);
 
 	return (
 		<Container x={x} y={y} scale={0.9}>
@@ -609,9 +637,10 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			<Container angle={angle}>
 				<TrunkBack/>
 				<Owl owl={owl} onClick={owlTrigger}/>
+				{showBear && <BearBack x={0} y={-350} flipped={beeHive.flipped} state={beeHive.state}/>}
 				<Trunk state={treeState}/>
+				{showBear && <BearFront x={0} y={-350} flipped={beeHive.flipped} state={beeHive.state}/>}
 				{owl.state === "hidden" && <Owl owl={owl} onClick={owlTrigger}/>}
-				{["fallen", "grabbing", "disappearing"].includes(beeHive.state) && <Bear x={-44} y={-90} flipped={beeHive.flipped} state={beeHive.state}/>}
 				{branches.filter(b => !b.dropping).map(branch => (
 					<Branch
 						key={branch.id}

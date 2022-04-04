@@ -105,6 +105,18 @@ export const AnimationData = {
 		start: 0,
 		end: 25,
 	},
+	"TheBear_Back": {
+		infix: "_0",
+		fps: 15,
+		start: 0,
+		end: 24,
+	},
+	"TheBear_Front": {
+		infix: "_0",
+		fps: 15,
+		start: 0,
+		end: 24,
+	},
 }
 
 export const SoundData = [
