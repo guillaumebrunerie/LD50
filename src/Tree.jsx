@@ -294,8 +294,8 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			return;
 		}
 		const data = birdProbabilities[birds.length]
-		const newBird = data ? Math.random() < data["in"] : 0.1;
-		const birdLeaves = data ? Math.random() < data["out"] : 1;
+		const newBird = Math.random() < (data ? data["in"] : 0.1);
+		const birdLeaves = Math.random() < (data ? data["out"] : 1);
 		if (birdLeaves) {
 			removeRandomBird();
 		}
@@ -612,6 +612,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				<TrunkBack/>
 				<Owl owl={owl} onClick={owlTrigger}/>
 				<Trunk state={treeState}/>
+				{owl.state === "hidden" && <Owl owl={owl} onClick={owlTrigger}/>}
 				{["fallen", "grabbing", "disappearing"].includes(beeHive.state) && <Bear x={-44} y={-90} flipped={beeHive.flipped} state={beeHive.state}/>}
 				{branches.filter(b => !b.dropping).map(branch => (
 					<Branch
