@@ -503,7 +503,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		}
 	}
 
-	const beeHiveAcceleration = 0.5;
+	const beeHiveAcceleration = 0;
 	const [beeHive, setBeeHive] = React.useState(() => {
 		const branch = branches.find(b => b.id == 2);
 		const a = branch.angle1 * Math.PI/180;
@@ -523,15 +523,18 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		const y = beeHive.y * Math.cos(a) + beeHive.x * Math.sin(a);
 
 		sound.play("BeeHiveReleased");
-		setBeeHive({...beeHive, state: "falling", x, y, speed: 4});
+		setBeeHive({...beeHive, state: "falling", x, y, speed: 20});
 	}
+
+	const beeHiveLimitY = -80;
+	const beeHiveFallenY = -50;
 
 	useTicker(delta => {
 		const deltaMS = delta * 16.67;
-		if (beeHive.state === "falling" && beeHive.y >= 0) {
+		if (beeHive.state === "falling" && beeHive.y >= beeHiveLimitY) {
 			sound.play("BeeHiveDrops");
 			sound.play("Bear");
-			setBeeHive({...beeHive, state: "fallen", y: 0, timeout: bearAppearDuration, flipped: angle < 0})
+			setBeeHive({...beeHive, state: "fallen", y: beeHiveFallenY, timeout: bearAppearDuration, flipped: angle < 0})
 			scareAllBirds();
 			scareBeaver();
 		} else if (beeHive.state == "falling") {
