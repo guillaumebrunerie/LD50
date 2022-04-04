@@ -7,6 +7,7 @@ export const TextureData = {
 	"Bg": "Bg.png",
 	"BgGround": "BgGround.png",
 
+	"Font": "font.json",
 	"Tree": "tree.json",
 	"Owl": "Owl.png",
 	"BeeHive": "BeeHive.png",

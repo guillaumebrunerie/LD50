@@ -22,6 +22,30 @@ const StartButton = ({onClick}) => {
 	);
 };
 
+const CustomText = ({text, ...props}) => {
+	const scale = 0.4;
+	const kerning = 10;
+	const space = 30;
+	let x = props.x;
+	let result = [];
+	text.split("").forEach((char, i) => {
+		if (char == ":") char = "collon";
+		if (char == ".") char = "dot";
+		if (char == "!") char = "ExMark";
+		if (char == " ") {
+			x += space * scale;
+			return;
+		}
+		const texture = Textures.Font.get(char);
+		if (!texture) {
+			debugger;
+		}
+		result.push(<Sprite anchor={[0, 1]} key={i} texture={texture} {...props} scale={scale} x={x}/>);
+		x += (texture.width + kerning) * scale;
+	});
+	return result;
+};
+
 const MainScreen = () => {
 	const [isGameOver, setIsGameOver] = React.useState(true);
 	const [attempt, setAttempt] = React.useState(0);
@@ -56,6 +80,8 @@ const MainScreen = () => {
 	const previousTreeX = attempt == 0 ? -Infinity : 360 - t * levelSpeed;
 	const treeX = attempt == 0 ? 360 : Math.max(levelDistance - t * levelSpeed, 360)
 
+	const score = isGameOver ? `${lastScore}` : `${((Date.now() - startTime) / 1000).toFixed(1)}`
+
 	return (
 		<Container>
 			<Sprite texture={Textures.Bg} x={0} y={0}/>
@@ -63,11 +89,10 @@ const MainScreen = () => {
 			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={treeX} y={1280}/>
 			<Tree key={attempt - 1} isGameOver={true} gameOver={() => {}} x={previousTreeX} y={1280 - 115}/>
 			<Tree key={attempt} isFirstScreen={attempt == 0} isGameOver={isGameOver} gameOver={gameOver} x={treeX} y={1280 - 115}/>
-			{!isGameOver && <Text x={10} y={10} text={`Score: ${((Date.now() - startTime) / 1000).toFixed(1)} seconds`}/>}
-			{isGameOver && lastScore > 0 && <Text x={10} y={10} text={`Score: ${lastScore} seconds`}/>}
-			{isGameOver && <Sprite texture={Textures.Logo} x={360} y={350} anchor={0.5}/>}
-			{isGameOver && lastScore > 0 && <Text x={10} y={40} text={`Game over!`}/>}
-			{isGameOver && lastScore > 0 && <Text x={10} y={70} text={`High score: ${highScore} seconds`}/>}
+			<CustomText text={"SCORE: " + score} x={10} y={40}/>
+			{isGameOver && <Sprite texture={Textures.Logo} x={360} y={370} anchor={0.5}/>}
+			{isGameOver && lastScore > 0 && <CustomText x={10} y={90} text={`GAME OVER!`}/>}
+			{isGameOver && lastScore > 0 && <CustomText x={10} y={140} text={`HIGHSCORE: ${highScore} SECONDS`}/>}
 			{isGameOver && <StartButton onClick={newGame}/>}
 		</Container>
 	);
