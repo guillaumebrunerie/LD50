@@ -229,6 +229,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			setAngle(90 * angle / Math.abs(angle));
 			setSpeedRaw(0);
 			setTreeState(state => ({...state, broken: true}));
+			scareAllBirds();
 			gameOver();
 			return;
 		}
@@ -239,17 +240,9 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 
 	// Main loop for flying birds
 	useTicker(delta => {
-		if (isGameOver) {
-			return;
-		}
-
 		setBirds(birds => birds.flatMap(bird => {
 			if (bird.state === "flying") {
 				const result = flyBird(bird, delta);
-				if (result.state == "standing") {
-					const deltaSpeed = landingSpeed * treeFactor[treeState.level - 1] * birdFactor[bird.size];
-					// setSpeed(speed => result.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
-				}
 				return [result];
 			} else if (bird.state === "leaving") {
 				const result = flyBird(bird, delta);
