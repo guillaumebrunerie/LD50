@@ -35,7 +35,7 @@ Graphical tasks
 ---------------
 
 Animations:
-- Owl animation
+X Owl animation
 - Bear animations
 - Tree breaking animation (flash at the base when the tree falls)
 - Branch hitting the ground animation
