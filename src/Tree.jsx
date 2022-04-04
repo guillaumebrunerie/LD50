@@ -13,9 +13,9 @@ import Beaver from "./Beaver";
 import AnimatedSprite from "./components/AnimatedSprite";
 
 const branchWeight = 2;
-const beeHiveWeight = 2;
+const beeHiveWeight = 1;
 const birdWeight = {"Small": 1, "Medium": 2, "Big": 3};
-const birdSpeedFactor = [0.01, 0.04, 0.07];
+const birdSpeedFactor = [0.015, 0.04, 0.06];
 const limitAngle = 25; // Max angle before the game is lost
 const birdSpeed = 15;
 const birdProbabilities = [
@@ -249,6 +249,9 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		// Make sure the tree is always moving
 		if (newSpeed == 0 && angle !== 0) {
 			newSpeed = angle / Math.abs(angle);
+		}
+		if (Math.abs(newSpeed) <= Math.abs(angle) / 5) {
+			newSpeed = newSpeed / Math.abs(newSpeed) * Math.abs(angle) / 5;
 		}
 		const initialFallSpeed = 0.4;
 		const finalFallSpeed = 4;
@@ -492,8 +495,8 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	// };
 
 	const beaverSpeed = 0.5;
-	const choppingTime = 3000;
-	const waitingTime = 10000;
+	const choppingTime = 4000;
+	const waitingTime = 12000;
 	const beaverY = 180;
 	const beaverX = 110;
 	// state: "hidden", "arriving", "chopping", "leaving"
