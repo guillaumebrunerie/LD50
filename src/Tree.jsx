@@ -173,12 +173,16 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			setBeeHive({state: "gone", y: -2000});
 		} else {
 			setTimeout(() => {
-				addBird(findPosition(branches, [], 1));
-				addBird(findPosition(branches, [], -1));
+				addBird(1);
+				setTimeout(() => {
+					addBird(-1);
+				})
 			}, 1000);
 			setTimeout(() => {
-				addBird(findPosition(branches, [], 1));
-				addBird(findPosition(branches, [], -1));
+				addBird(1);
+				setTimeout(() => {
+					addBird(-1);
+				})
 			}, 1500);
 		}
 	});
@@ -294,7 +298,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			removeRandomBird();
 		}
 		if (newBird) {
-			addBird(findPosition(branches, birds));
+			addBird();
 		}
 	}, 1000);
 
@@ -332,21 +336,24 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		});
 	}
 
-	const addBird = (dest) => {
-		if (!dest) {
-			return;
-		}
-		const randomColor = () => Math.floor(Math.random() * 3) + 1;
-		const randomSize = () => ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];
-		const newBird = {
-			id: Math.random(),
-			color: randomColor(),
-			size: randomSize(),
-			...randomDestination(dest.x / Math.abs(dest.x)),
-			dest,
-			state: "flying",
-		}
-		setBirds(birds => [...birds, newBird])
+	const addBird = (side) => {
+		setBirds(birds => {
+			const dest = findPosition(branches, birds, side)
+			if (!dest) {
+				return;
+			}
+			const randomColor = () => Math.floor(Math.random() * 3) + 1;
+			const randomSize = () => ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];
+			const newBird = {
+				id: Math.random(),
+				color: randomColor(),
+				size: randomSize(),
+				...randomDestination(dest.x / Math.abs(dest.x)),
+				dest,
+				state: "flying",
+			}
+			return [...birds, newBird];
+		});
 	};
 
 	const flipBird = bird => () => {
@@ -570,8 +577,12 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		const birdsToAddLeft = Math.ceil(Math.min(Math.max((4 + signedBirdsToAddLeft) / 2, 0), 4));
 		const birdsToAddRight = Math.ceil(Math.min(Math.max((4 - signedBirdsToAddLeft) / 2, 0), 4));
 		// Add 4 or 5 birds to try to reach an equilibrium
-		[...new Array(birdsToAddLeft).keys()].forEach(() => addBird(findPosition(branches, birds, -1)));
-		[...new Array(birdsToAddRight).keys()].forEach(() => addBird(findPosition(branches, birds, 1)));
+		[...new Array(birdsToAddLeft).keys()].forEach(() => {
+			setTimeout(() => addBird(-1))
+		});
+		[...new Array(birdsToAddRight).keys()].forEach(() => {
+			setTimeout(() => addBird(1))
+		});
 	}
 
 	const debugThings = [...new Array(0).keys()].map(() => findPosition(branches, []));
@@ -602,7 +613,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				<TreeFront/>
 				{debugThings.map(({x, y}, i) => <Circle key={i} x={x} y={y}/>)}
 			</Container>
-			{beeHive.state !== "attached" && <BeeHive x={beeHive.x} y={beeHive.y}/>}
+			{beeHive.state !== "attached" && <BeeHive x={beeHive.x} y={beeHive.y} active={false}/>}
 			{branches.filter(b => b.dropping).map(branch => (
 				<Branch key={branch.id} branch={branch}/>
 			))}

@@ -109,7 +109,13 @@ export const findPosition = (branches, birds, sign = 0) => {
 			y = middleY + (t - 0.5) * 2 * Math.sin(angle2 * Math.PI/180) * branchLength3[type];
 		}
 
-		if (birds.every(bird => Math.pow(bird.x - x, 2) + Math.pow(bird.y - y, 2) >= birdDistanceSquared)) {
+		const birdPositions = birds.flatMap(bird => (
+			bird.state === "standing" ? [bird] :
+				bird.state === "flying" ? [bird.dest] :
+				bird.state === "leaving" ? [] : []
+		));
+
+		if (birdPositions.every(pos => Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2) >= birdDistanceSquared)) {
 			return {x, y, branch};
 		}
 		tries++;
