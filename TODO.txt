@@ -13,6 +13,9 @@ Programming tasks
 - Birds should arrive from above and on the same side
 - Birds should leave to the same side
 - One click on a branch drops it
+- Correct initial position of beehive
+- Better behavior for owl
+- Fix CSS and check that it works on itch.io
 
 Graphical tasks
 ---------------
