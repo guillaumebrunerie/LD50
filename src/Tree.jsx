@@ -138,7 +138,13 @@ const Bear = ({x, y, flipped, state, ...props}) => {
 	)
 }
 
-const getAngle = () => (Math.random() - 0.5) * 90
+const getBranchAngles = () => {
+	const getAngle = () => (Math.random() > 0.5 ? -1 : 1) * (20 + Math.random() * 30);
+	const angle1 = getAngle();
+	const deltaAngle = Math.abs(getAngle());
+	const angle2 = angle1 > 0 ? angle1 - deltaAngle : angle1 + deltaAngle;
+	return {angle1, angle2};
+}
 
 const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
@@ -150,12 +156,12 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		setSpeedRaw(setter);
 	};
 	const [branches, setBranches] = React.useState([
-		{id: 1, x: 36, y: -300,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "A"},
-		{id: 2, x: 36, y: -450,  flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "B"},
-		{id: 3, x: 36, y: -600,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "C"},
-		{id: 4, x: 36, y: -750,  flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "A"},
-		{id: 5, x: 36, y: -900,  flipX: false, state: 0, angle1: getAngle(), angle2: getAngle(), type: "B"},
-		{id: 6, x: 36, y: -1050, flipX: true,  state: 0, angle1: getAngle(), angle2: getAngle(), type: "C"},
+		{id: 1, x: 36, y: -300,  flipX: false, state: 0, ...getBranchAngles(), type: "A"},
+		{id: 2, x: 36, y: -450,  flipX: true,  state: 0, ...getBranchAngles(), type: "B"},
+		{id: 3, x: 36, y: -600,  flipX: false, state: 0, ...getBranchAngles(), type: "C"},
+		{id: 4, x: 36, y: -750,  flipX: true,  state: 0, ...getBranchAngles(), type: "A"},
+		{id: 5, x: 36, y: -900,  flipX: false, state: 0, ...getBranchAngles(), type: "B"},
+		{id: 6, x: 36, y: -1050, flipX: true,  state: 0, ...getBranchAngles(), type: "C"},
 	]);
 
 	const [birds, setBirds] = React.useState([]);
@@ -310,11 +316,11 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		removeBird(standingBirds[index]);
 	}
 
-	const removeBird = (bird) => {
+	const removeBird = (bird, dirFactor = 1) => {
 		setBirds(birds => {
 			const deltaSpeed = takeOffSpeed * treeFactor[treeState.level - 1] * birdFactor[bird.size];
 			// setSpeed(speed => bird.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
-			return birds.map(b => b === bird ? {...b, state: "leaving", dest: randomDestination(b.x / Math.abs(b.x))} : b);
+			return birds.map(b => b === bird ? {...b, state: "leaving", dest: randomDestination(b.x / Math.abs(b.x) * dirFactor)} : b);
 		});
 	}
 
@@ -347,41 +353,41 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		sound.play("Chirp");
 		const newPosition = findPosition(branches, birds, -bird.x);
 		if (!newPosition) {
-			removeBird(bird);
+			removeBird(bird, -1);
 			return;
 		}
 		setBirds(birds.map(b => b === bird ? {...b, dest: newPosition, state: "flying"} : b));
 	};
 
-	const getBranchAngle = () => {
-		return (Math.random() > 0.5 ? -1 : 1) * (30 + Math.random() * 40);
-	}
+	// const getBranchAngle = () => {
+	// 	return (Math.random() > 0.5 ? -1 : 1) * (30 + Math.random() * 40);
+	// }
 
-	const breakBranch = branch => {
-		const angle1 = getBranchAngle();
-		const deltaAngle = Math.abs(getBranchAngle());
-		const angle2 = angle1 > 0 ? angle1 - deltaAngle : angle1 + deltaAngle;
+	// const breakBranch = branch => {
+	// 	const angle1 = getBranchAngle();
+	// 	const deltaAngle = Math.abs(getBranchAngle());
+	// 	const angle2 = angle1 > 0 ? angle1 - deltaAngle : angle1 + deltaAngle;
 
-		switch (branch.state) {
-		case 0:
-			return [{...branch, state: 1, angle2: angle1}];
-		case 1:
-			return [{...branch, state: 2, angle1, angle2}];
-		case 2: {
-			const a = angle * Math.PI/180;
-			const origX = branch.x * (branch.flipX ? -1 : 1);
-			const origY = branch.y;
-			const x = (origX * Math.cos(a) - origY * Math.sin(a)) * (branch.flipX ? -1 : 1);
-			const y = origY * Math.cos(a) + origX * Math.sin(a);
-			const angle1 = branch.angle1 + (branch.flipX ? -1 : 1) * angle;
-			const angle2 = branch.angle2 + (branch.flipX ? -1 : 1) * angle;
-			return [
-				{...branch, state: 3},
-				{...branch, id: branch.id + 100, x, y, dropping: true, state: 3, angle1, angle2, speed: 3}
-			];
-		}
-		}
-	}
+	// 	switch (branch.state) {
+	// 	case 0:
+	// 		return [{...branch, state: 1, angle2: angle1}];
+	// 	case 1:
+	// 		return [{...branch, state: 2, angle1, angle2}];
+	// 	case 2: {
+	// 		const a = angle * Math.PI/180;
+	// 		const origX = branch.x * (branch.flipX ? -1 : 1);
+	// 		const origY = branch.y;
+	// 		const x = (origX * Math.cos(a) - origY * Math.sin(a)) * (branch.flipX ? -1 : 1);
+	// 		const y = origY * Math.cos(a) + origX * Math.sin(a);
+	// 		const angle1 = branch.angle1 + (branch.flipX ? -1 : 1) * angle;
+	// 		const angle2 = branch.angle2 + (branch.flipX ? -1 : 1) * angle;
+	// 		return [
+	// 			{...branch, state: 3},
+	// 			{...branch, id: branch.id + 100, x, y, dropping: true, state: 3, angle1, angle2, speed: 3}
+	// 		];
+	// 	}
+	// 	}
+	// }
 
 	const branchAcceleration = 0.5;
 
@@ -398,24 +404,44 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		}));
 	});
 
-	const branchSpeed = 0.2;
-	const holdBranch = branch => () => {
-		const deltaSpeed = (0.5 + Math.random() / 2) * branchSpeed;
-		// setAngle(branch.flipX ? angle - 5 : angle + 5);
-		// setSpeedRaw(branch.flipX ? speed - deltaSpeed : speed + deltaSpeed);
-		const brokenBranches = breakBranch(branch);
-		setBranches(branches.flatMap(b => b === branch ? brokenBranches : [b]))
+	const breakBranch = branch => () => {
+		const a = angle * Math.PI/180;
+		const origX = branch.x * (branch.flipX ? -1 : 1);
+		const origY = branch.y;
+		const x = (origX * Math.cos(a) - origY * Math.sin(a)) * (branch.flipX ? -1 : 1);
+		const y = origY * Math.cos(a) + origX * Math.sin(a);
+		const angle1 = branch.angle1 + (branch.flipX ? -1 : 1) * angle;
+		const angle2 = branch.angle2 + (branch.flipX ? -1 : 1) * angle;
+
+		const branch1 = {...branch, state: 3};
+		const branch2 = {...branch, id: branch.id + 100, x, y, dropping: true, state: 3, angle1, angle2, speed: 3};
+
+		setBranches(branches.flatMap(b => b === branch ? [branch1, branch2] : [b]))
 		scareBirds(branch.id);
 
-		// Reposition bee hive
 		if (branch.id === 1 && beeHive.state === "attached") {
-			if (brokenBranches.length == 1) {
-				reAttachBeeHive(brokenBranches[0]);
-			} else {
-				dropBeeHive();
-			}
+			dropBeeHive();
 		}
-	};
+	}
+
+	// const branchSpeed = 0.2;
+	// const holdBranch = branch => () => {
+	// 	const deltaSpeed = (0.5 + Math.random() / 2) * branchSpeed;
+	// 	// setAngle(branch.flipX ? angle - 5 : angle + 5);
+	// 	// setSpeedRaw(branch.flipX ? speed - deltaSpeed : speed + deltaSpeed);
+	// 	const brokenBranches = breakBranch(branch);
+	// 	setBranches(branches.flatMap(b => b === branch ? brokenBranches : [b]))
+	// 	scareBirds(branch.id);
+
+	// 	// Reposition bee hive
+	// 	if (branch.id === 1 && beeHive.state === "attached") {
+	// 		if (brokenBranches.length == 1) {
+	// 			reAttachBeeHive(brokenBranches[0]);
+	// 		} else {
+	// 			dropBeeHive();
+	// 		}
+	// 	}
+	// };
 
 	const beaverSpeed = 0.5;
 	const choppingTime = 3000;
@@ -462,10 +488,11 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		}
 	});
 
+	const minTimeoutScaredBeaver = 1000;
 	const scareBeaver = () => {
 		switch (beaverStatus.state) {
 		case "hidden":
-			setBeaverStatus({...beaverStatus, timeout: waitingTime});
+			setBeaverStatus({...beaverStatus, timeout: Math.max(beaverStatus.timeout, minTimeoutScaredBeaver)});
 			break;
 		case "chopping":
 		case "leaving":
@@ -561,7 +588,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 					<Branch
 						key={branch.id}
 						branch={{...branch, dropping: false}}
-						onClick={holdBranch(branch)}
+						onClick={breakBranch(branch)}
 					/>
 				))}
 				{beeHive.state === "attached" && <BeeHive x={beeHive.x} y={beeHive.y} angle={-angle} active={Math.abs(angle) <= limitAngle} onClick={dropBeeHive}/>}
