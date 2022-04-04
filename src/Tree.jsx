@@ -98,7 +98,8 @@ const Trunk = ({state: {level, broken}}) => {
 	);
 };
 
-const BeeHive = ({onClick, ...props}) => {
+const BeeHive = ({active, onClick, ...props}) => {
+	onClick = active && onClick;
 	return <Sprite texture={Textures.BeeHive} anchor={[0.5, 0]} buttonMode={!!onClick} interactive={!!onClick} pointerdown={onClick} {...props}/>
 }
 
@@ -563,7 +564,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 						onClick={holdBranch(branch)}
 					/>
 				))}
-				{beeHive.state === "attached" && <BeeHive x={beeHive.x} y={beeHive.y} angle={-angle} onClick={dropBeeHive}/>}
+				{beeHive.state === "attached" && <BeeHive x={beeHive.x} y={beeHive.y} angle={-angle} active={Math.abs(angle) <= limitAngle} onClick={dropBeeHive}/>}
 				{birds.map(bird => (
 					<Bird
 						key={bird.id}
