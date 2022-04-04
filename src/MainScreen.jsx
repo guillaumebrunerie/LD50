@@ -5,6 +5,7 @@ import Tree from "./Tree";
 import { sound } from '@pixi/sound';
 import useButton from "@hooks/useButton";
 import useLocalTime from "@hooks/useLocalTime";
+import useTicker from "@hooks/useTicker";
 import * as PIXI from "pixi.js";
 
 const StartButton = ({onClick}) => {
@@ -49,17 +50,19 @@ const CustomText = ({text, ...props}) => {
 const MainScreen = () => {
 	const [isGameOver, setIsGameOver] = React.useState(true);
 	const [attempt, setAttempt] = React.useState(0);
-	const [startTime, setStartTime] = React.useState(() => Date.now());
-	const [lastScore, setLastScore] = React.useState(0);
 	const [highScore, setHighScore] = React.useState(0);
+
+	const [score, setScore] = React.useState(0);
+	useTicker(delta => {
+		if (!isGameOver) {
+			setScore(score => score + (delta * 16.67) / 1000);
+		}
+	})
 
 	const gameOver = () => {
 		if (!isGameOver) {
 			setIsGameOver(true);
 			sound.play("TreeCrashes");
-			const deltaTime = Date.now() - startTime;
-			const score = Math.round(deltaTime / 100) / 10;
-			setLastScore(score);
 			setHighScore(highScore => Math.max(highScore, score));
 		}
 	};
@@ -69,8 +72,8 @@ const MainScreen = () => {
 		setAttempt(attempt => attempt + 1);
 		setTimeout(() => {
 			setIsGameOver(false);
+			setScore(0);
 		});
-		setStartTime(Date.now());
 		reset();
 	}
 
@@ -82,7 +85,8 @@ const MainScreen = () => {
 	const treeX = 360 + ((t <= levelSwitchDuration && attempt > 0) ? movingTreeX : 0);
 	const previousTreeX = treeX - levelDistance;
 
-	const score = isGameOver ? `${lastScore}` : `${((Date.now() - startTime) / 1000).toFixed(1)}`
+	const toTxt = score => score.toFixed(1);
+	// const scoreTxT = isGameOver ? `${lastScore}` : `${((Date.now() - startTime) / 1000).toFixed(1)}`
 
 	return (
 		<Container>
@@ -91,10 +95,10 @@ const MainScreen = () => {
 			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={treeX} y={1280}/>
 			<Tree key={attempt - 1} isGameOver={true} gameOver={() => {}} x={previousTreeX} y={1280 - 115}/>
 			<Tree key={attempt} isFirstScreen={attempt == 0} isGameOver={isGameOver} gameOver={gameOver} x={treeX} y={1280 - 115}/>
-			<CustomText text={"SCORE: " + score} x={10} y={40}/>
+			<CustomText text={"SCORE: " + toTxt(score)} x={10} y={40}/>
 			{isGameOver && <Sprite texture={Textures.Logo} x={360} y={450} anchor={0.5}/>}
-			{isGameOver && lastScore > 0 && <CustomText x={10} y={90} text={`GAME OVER!`}/>}
-			{isGameOver && lastScore > 0 && <CustomText x={10} y={140} text={`HIGHSCORE: ${highScore} SECONDS`}/>}
+			{isGameOver && score > 0 && <CustomText x={10} y={90} text={`GAME OVER!`}/>}
+			{isGameOver && score > 0 && <CustomText x={10} y={140} text={`HIGHSCORE: ${toTxt(highScore)} SECONDS`}/>}
 			{isGameOver && <StartButton onClick={newGame}/>}
 		</Container>
 	);
