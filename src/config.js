@@ -102,4 +102,18 @@ export const AnimationData = {
 	// },
 }
 
-export const SoundData = ["Chirp", "TreeCrashes"];
+export const SoundData = [
+	"Bear",
+	"BeaverEatsTree",
+	"BeaverEnters",
+	"BeaverAteTree",
+	"BeaverScared",
+	"BeeHiveDrops",
+	"BeeHiveReleased",
+	"BranchBreaks",
+	"BranchDrops",
+	"Chirp",
+	"Owl",
+	"StartButton",
+	"TreeCrashes",
+]

@@ -2,12 +2,13 @@ Programming tasks
 -----------------
 
 X Birds sometimes land on non-existing branches
-- Timer keeps counting when game is paused
-- Ease for tree falling
-- Add sound triggers
+X Timer keeps counting when game is paused
+X Ease for tree falling
 - Check if I can preload sounds
+- Add music and music button
 
 Wishlist:
+- Birds should come from the side/above no matter the angle of the tree
 - Clicking owl when one side has no branches makes a lot of bird fly by
 
 Done:
@@ -27,6 +28,7 @@ X Tweak the arriving/leaving behaviour (a bit more birds, a bit more random)
 X Fix hit boxes of birds
 X Bird should arrive and fly away from/to above
 X Fix crash when clicking owl and there is no space
+X Add sound triggers
 
 Graphical tasks
 ---------------

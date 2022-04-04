@@ -389,6 +389,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			}
 			const dropped = branch.y > 100;
 			if (dropped) {
+				sound.play("BranchDrops");
 				scareBeaver();
 			}
 			return {...branch, dropped, y: branch.y + branch.speed, speed: branch.speed + branchAcceleration * delta}
@@ -409,6 +410,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 
 		setBranches(branches.flatMap(b => b === branch ? [branch1, branch2] : [b]))
 		scareBirds(branch.id);
+		sound.play("BranchBreaks");
 
 		if (branch.id === 1 && beeHive.state === "attached") {
 			dropBeeHive();
@@ -451,6 +453,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			case "hidden": {
 				if (!isGameOver) {
 					const direction = Math.random() > 0.5 ? -1 : 1;
+					sound.play("BeaverEnters");
 					setBeaverStatus({...beaverStatus, state: "arriving", direction, x: 500, y: beaverY, dest: {x: beaverX, y: beaverY}, timeout: 0});
 				}
 				break;
@@ -459,6 +462,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				if (!isGameOver && treeState.level < 3) {
 					setTreeState({...treeState, level: treeState.level + 1});
 				}
+				sound.play("BeaverAteTree");
 				setBeaverStatus({...beaverStatus, state: "leaving", dest: {x: -500, y: beaverY}, timeout: 0});
 				break;
 			}
@@ -470,6 +474,9 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 					const state = beaverStatus.state == "arriving" ? "chopping" : "hidden";
 					const timeout = beaverStatus.state == "arriving" ? choppingTime : waitingTime;
 					setBeaverStatus({...beaverStatus, state, x, y, timeout});
+					if (state === "chopping") {
+						sound.play("BeaverEatsTree");
+					}
 				} else {
 					setBeaverStatus({...beaverStatus, x, y});
 				}
@@ -488,6 +495,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		case "chopping":
 		case "leaving":
 		case "arriving":
+			sound.play("BeaverScared");
 			setBeaverStatus({...beaverStatus, state: "scared", dest: {x: -500, y: beaverY}, timeout: 0});
 			break;
 		}
@@ -512,12 +520,15 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		const x = beeHive.x * Math.cos(a) - beeHive.y * Math.sin(a);
 		const y = beeHive.y * Math.cos(a) + beeHive.x * Math.sin(a);
 
+		sound.play("BeeHiveReleased");
 		setBeeHive({...beeHive, state: "falling", x, y, speed: 4});
 	}
 
 	useTicker(delta => {
 		const deltaMS = delta * 16.67;
 		if (beeHive.state === "falling" && beeHive.y >= 0) {
+			sound.play("BeeHiveDrops");
+			sound.play("Bear");
 			setBeeHive({...beeHive, state: "fallen", y: 0, timeout: bearAppearDuration, flipped: angle < 0})
 			scareAllBirds();
 			scareBeaver();
@@ -551,6 +562,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 
 	const [owl, setOwl] = React.useState({state: "watching"});
 	const owlTrigger = () => {
+		sound.play("Owl");
 		setOwl({state: "hidden"});
 
 		[...new Array(5).keys()].forEach(() => addBird(undefined, true));

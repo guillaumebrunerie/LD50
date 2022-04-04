@@ -65,6 +65,7 @@ const MainScreen = () => {
 	};
 
 	const newGame = () => {
+		sound.play("StartButton");
 		setAttempt(attempt => attempt + 1);
 		setTimeout(() => {
 			setIsGameOver(false);
