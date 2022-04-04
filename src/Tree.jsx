@@ -216,13 +216,12 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			}
 		});
 		// Branch weight
-		branches.filter(b => b.state === 0).forEach(branch => {
-			if (branch.flipX) {
-				weight -= branchWeight;
-			} else {
-				weight += branchWeight;
-			}
-		})
+		const leftBranches = branches.filter(b => b.state === 0 && b.flipX).length;
+		const rightBranches = branches.filter(b => b.state === 0 && !b.flipX).length;
+		weight += branchWeight * (rightBranches - leftBranches);
+		if (leftBranches == 0) weight += 7;
+		if (rightBranches == 0) weight -= 7;
+		if (leftBranches == 0 && rightBranches == 0) weight += angle / Math.abs(angle) * 15;
 		// Hive weight
 		if (beeHive.state === "attached") {
 			weight -= beeHiveWeight;
