@@ -12,25 +12,19 @@ import Bird from "./Bird";
 import Beaver from "./Beaver";
 import AnimatedSprite from "./components/AnimatedSprite";
 
-const treeFactor = [0.3, 1, 3];
-const birdFactor = {"Small": 0.3, "Medium": 1, "Big": 3};
 const birdSize = {"Small": 1, "Medium": 2, "Big": 3};
 const birdSpeedFactor = [0.01, 0.04, 0.07];
-const aFactor = 2e-5;  // Influence of one degree
-const bFactor = 4e-5; // Influence of one bird
-const landingSpeed = 0.05; // Influence of one bird landing
-const takeOffSpeed = -0.02; // Influence of one bird leaving
 const limitAngle = 25; // Max angle before the game is lost
-const endAcceleration = 0; //0.015; // Acceleration when we reach the limit angle
 const birdSpeed = 15;
 const birdProbabilities = [
 	{"in": 1, "out": 0}, // Probabilities of birds arriving/leaving when there is 0
 	{"in": 1, "out": 0}, // 1
 	{"in": 1, "out": 0}, // 2
-	{"in": 0.5, "out": 0.1}, // 3
-	{"in": 0.5, "out": 0.5}, // 4
-	{"in": 0.1, "out": 0.5}, // 5
-	{"in": 0, "out": 1}, // 6
+	{"in": 1, "out": 0.2}, // 3
+	{"in": 0.7, "out": 0.3}, // 4
+	{"in": 0.5, "out": 0.5}, // 5
+	{"in": 0.3, "out": 0.7}, // 6
+	{"in": 0.2, "out": 1}, // 7
 ]
 
 const useOnMount = (callback) => {
@@ -187,19 +181,6 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		}
 	});
 
-	let baseAcceleration = Math.sin(angle * Math.PI/180) * 90 * aFactor * treeFactor[treeState.level - 1];
-	let acceleration = baseAcceleration;
-	birds.filter(b => b.state === "standing").forEach(b => {
-		if (b.x > 0) {
-			acceleration += bFactor * treeFactor[treeState.level - 1] * birdFactor[b.size];
-		} else {
-			acceleration -= bFactor * treeFactor[treeState.level - 1] * birdFactor[b.size];
-		}
-	});
-	if (Math.abs(angle) > limitAngle) {
-		acceleration += angle > 0 ? endAcceleration : -endAcceleration;
-	}
-
 	let newSpeed = 0;
 	birds.filter(b => b.state === "standing").forEach(b => {
 		if (b.x > 0) {
@@ -285,7 +266,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			return;
 		}
 		const data = birdProbabilities[birds.length]
-		const newBird = data ? Math.random() < data["in"] : 0;
+		const newBird = data ? Math.random() < data["in"] : 0.1;
 		const birdLeaves = data ? Math.random() < data["out"] : 1;
 		if (birdLeaves) {
 			removeRandomBird();
@@ -314,11 +295,9 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	}
 
 	const removeBird = (bird, dirFactor = 1) => {
-		setBirds(birds => {
-			const deltaSpeed = takeOffSpeed * treeFactor[treeState.level - 1] * birdFactor[bird.size];
-			// setSpeed(speed => bird.x < 0 ? speed - deltaSpeed : speed + deltaSpeed);
-			return birds.map(b => b === bird ? {...b, state: "leaving", dest: randomDestination(b.x / Math.abs(b.x) * dirFactor)} : b);
-		});
+		setBirds(birds => (
+			birds.map(b => b === bird ? {...b, state: "leaving", dest: randomDestination(b.x / Math.abs(b.x) * dirFactor)} : b)
+		));
 	}
 
 	const scareBirds = (branchId) => {
