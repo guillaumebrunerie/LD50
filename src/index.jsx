@@ -14,5 +14,5 @@ ReactDOM.render(
 			<App/>
 		</Loader>
 	</Stage>,
-	document.body
+	document.getElementById("container")
 );
