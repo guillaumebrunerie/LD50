@@ -6,7 +6,13 @@ Programming tasks
 - Timer keeps counting when game is paused
 - Birds should fly away on game over
 - The bear should not appear if we lost already
-
+- Birds should fly away on the outside
+- Ease for moving between levels
+- Ease for tree falling
+- Beaver on a random side
+- Birds should arrive from above and on the same side
+- Birds should leave to the same side
+- One click on a branch drops it
 
 Graphical tasks
 ---------------

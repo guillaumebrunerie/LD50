@@ -15,7 +15,7 @@ const StartButton = ({onClick}) => {
 			texture={isActive ? Textures.StartBtnOn : Textures.StartBtnDefault}
 			anchor={0.5}
 			x={360}
-			y={875}
+			y={960}
 			hitArea={new PIXI.Rectangle(-200, -100, 400, 200)}
 			{...props}
 		/>
@@ -90,7 +90,7 @@ const MainScreen = () => {
 			<Tree key={attempt - 1} isGameOver={true} gameOver={() => {}} x={previousTreeX} y={1280 - 115}/>
 			<Tree key={attempt} isFirstScreen={attempt == 0} isGameOver={isGameOver} gameOver={gameOver} x={treeX} y={1280 - 115}/>
 			<CustomText text={"SCORE: " + score} x={10} y={40}/>
-			{isGameOver && <Sprite texture={Textures.Logo} x={360} y={370} anchor={0.5}/>}
+			{isGameOver && <Sprite texture={Textures.Logo} x={360} y={450} anchor={0.5}/>}
 			{isGameOver && lastScore > 0 && <CustomText x={10} y={90} text={`GAME OVER!`}/>}
 			{isGameOver && lastScore > 0 && <CustomText x={10} y={140} text={`HIGHSCORE: ${highScore} SECONDS`}/>}
 			{isGameOver && <StartButton onClick={newGame}/>}

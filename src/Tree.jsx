@@ -22,7 +22,7 @@ const landingSpeed = 0.05; // Influence of one bird landing
 const takeOffSpeed = -0.02; // Influence of one bird leaving
 const limitAngle = 25; // Max angle before the game is lost
 const endAcceleration = 0; //0.015; // Acceleration when we reach the limit angle
-const birdSpeed = 10;
+const birdSpeed = 15;
 const birdProbabilities = [
 	{"in": 1, "out": 0}, // Probabilities of birds arriving/leaving when there is 0
 	{"in": 1, "out": 0}, // 1
@@ -137,7 +137,7 @@ const Bear = ({x, y, flipped, state, ...props}) => {
 	)
 }
 
-const getAngle = () => (Math.random() - 0.5) * 20
+const getAngle = () => (Math.random() - 0.5) * 90
 
 const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
@@ -548,7 +548,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const debugThings = [...new Array(0).keys()].map(() => findPosition(branches, []));
 
 	return (
-		<Container x={x} y={y}>
+		<Container x={x} y={y} scale={0.9}>
 			<Stump state={treeState}/>
 			<Container angle={angle}>
 				<TrunkBack/>
