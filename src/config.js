@@ -92,6 +92,18 @@ export const AnimationData = {
 		start: 0,
 		end: 12,
 	},
+	"Owl_Idle": {
+		infix: "_0",
+		fps: 3,
+		start: 0,
+		end: 6,
+	},
+	"Owl_Howl": {
+		infix: "_0",
+		fps: 15,
+		start: 0,
+		end: 25,
+	},
 }
 
 export const SoundData = [

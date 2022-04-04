@@ -75,11 +75,11 @@ const TreeFront = () => {
 
 const Owl = ({owl, onClick}) => {
 	if (owl.state === "hidden") {
-		return null;
+		return <AnimatedSprite key={1} start={Animations["Owl_Howl"]} scale={1} anchor={0.5} y={owlY}/>
 	}
 
 	return (
-		<Sprite texture={Textures.Owl} anchor={0.5} y={owlY} interactive buttonMode pointerdown={onClick}/>
+		<AnimatedSprite key={0} loop={Animations["Owl_Idle"]} scale={1.2} anchor={0.5} y={owlY} interactive buttonMode pointerdown={onClick}/>
 	)
 }
 
