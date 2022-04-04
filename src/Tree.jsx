@@ -434,18 +434,20 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	// }
 
 	const branchAcceleration = 0;
+	const branchDropY = 60;
 
 	useTicker(delta => {
 		setBranches(branches.map(branch => {
 			if (!branch.dropping || branch.dropped) {
 				return branch;
 			}
-			const dropped = branch.y > 100;
+			const dropped = branch.y > branchDropY;
 			if (dropped) {
 				sound.play("BranchDrops");
 				scareBeaver();
 			}
-			return {...branch, dropped, y: branch.y + branch.speed, speed: branch.speed + branchAcceleration * delta}
+			const y = dropped ? branchDropY : branch.y + branch.speed;
+			return {...branch, dropped, y, speed: branch.speed + branchAcceleration * delta}
 		}));
 	});
 

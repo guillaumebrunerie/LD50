@@ -45,6 +45,12 @@ export const TextureData = {
 };
 
 export const AnimationData = {
+	"BranchFall": {
+		infix: "_0",
+		fps: 15,
+		start: 0,
+		end: 7,
+	},
 	"Bird_Big_FlyingLoop": {
 		infix: "_0",
 		fps: 25,

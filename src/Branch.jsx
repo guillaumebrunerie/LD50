@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Container, Sprite } from "react-pixi-fiber/index.js";
 import Rectangle from "./components/Rectangle";
-import { Textures } from "./Loader";
+import AnimatedSprite from "./components/AnimatedSprite";
+import { Textures, Animations } from "./Loader";
 
 // const branchDeltaX = 36;
 const branchDeltaX2 = 9;
@@ -28,7 +29,15 @@ const anchors3 = {
 
 const margin = 20;
 
-export const Branch = ({ branch: { x, y, flipX, dropping, state, angle1, angle2, type }, onClick }) => {
+export const Branch = ({ branch: { x, y, flipX, dropping, state, angle1, angle2, type, dropped }, onClick }) => {
+	if (dropped) {
+		return (
+			<Container scale={[flipX ? -1 : 1, 1]}>
+				<AnimatedSprite start={Animations.BranchFall} scale={1.5} anchor={[0.25, 0.5]} x={x} y={y}/>
+			</Container>
+		)
+	}
+
 	const texture1 = Textures.Tree.get(`Branch_${type}_01`);
 	const texture2 = Textures.Tree.get(`Branch_${type}_02`);
 	const texture3 = Textures.Tree.get(`Branch_${type}_03`);
