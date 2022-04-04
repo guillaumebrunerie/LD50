@@ -14,6 +14,8 @@ const getSpriteSheet = resource => ({
 	}
 });
 
+export const Sounds = {};
+
 const loadTextures = (callback) => {
 	const loader = PIXI.Loader.shared;
 
@@ -25,8 +27,9 @@ const loadTextures = (callback) => {
 		loader.add(key, "./dist/" + (value.file || (key + ".json")));
 	});
 
+	const soundLoader = new PIXI.Loader();
 	SoundData.forEach(key => {
-		sound.add(key, `./dist/${key}.mp3`);
+		soundLoader.add(key, `./dist/${key}.mp3`);
 	});
 
 	loader.load((_, resources) => {
@@ -44,7 +47,13 @@ const loadTextures = (callback) => {
 		Object.entries(AnimationData).forEach(([key, value]) => {
 			Textures[key] = getSpriteSheet(resources[key]);
 		});
-		callback();
+
+		soundLoader.load((_, resources) => {
+			SoundData.forEach(key => {
+				Sounds[key] = resources[key].sound;
+			});
+			callback();
+		});
 	});
 }
 

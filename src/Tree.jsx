@@ -3,11 +3,10 @@ import { Container, Sprite } from "react-pixi-fiber/index.js";
 import { findPosition, Branch } from "./Branch";
 import Circle from "./components/Circle";
 import Rectangle from "./components/Rectangle";
-import { Textures, Animations } from "./Loader";
+import { Textures, Animations, Sounds } from "./Loader";
 import { useInterval } from "./useInterval";
 import useLocalTime from "./hooks/useLocalTime";
 import useTicker from "./hooks/useTicker";
-import { sound } from '@pixi/sound';
 import Bird from "./Bird";
 import Beaver from "./Beaver";
 import AnimatedSprite from "./components/AnimatedSprite";
@@ -396,7 +395,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	};
 
 	const flipBird = bird => () => {
-		sound.play("Chirp");
+		Sounds.Chirp.play();
 		const newPosition = findPosition(branches, birds, -bird.x);
 		if (!newPosition) {
 			removeBird(bird, -1);
@@ -445,7 +444,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			}
 			const dropped = branch.y > branchDropY;
 			if (dropped) {
-				sound.play("BranchDrops");
+				Sounds.BranchDrops.play();
 				scareBeaver();
 			}
 			const y = dropped ? branchDropY : branch.y + branch.speed;
@@ -467,7 +466,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 
 		setBranches(branches.flatMap(b => b === branch ? [branch1, branch2] : [b]))
 		scareBirds(branch.id);
-		sound.play("BranchBreaks");
+		Sounds.BranchBreaks.play();
 
 		if (branch.id === 2 && beeHive.state === "attached") {
 			dropBeeHive();
@@ -510,7 +509,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			case "hidden": {
 				if (!isGameOver) {
 					const direction = Math.random() > 0.5 ? -1 : 1;
-					sound.play("BeaverEnters");
+					Sounds.BeaverEnters.play();
 					setBeaverStatus({...beaverStatus, state: "arriving", direction, x: 500, y: beaverY, dest: {x: beaverX, y: beaverY}, timeout: 0});
 				}
 				break;
@@ -519,7 +518,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				if (!isGameOver && treeState.level < 3) {
 					setTreeState({...treeState, level: treeState.level + 1});
 				}
-				sound.play("BeaverAteTree");
+				Sounds.BeaverAteTree.play();
 				setBeaverStatus({...beaverStatus, state: "leaving", dest: {x: -500, y: beaverY}, timeout: 0});
 				break;
 			}
@@ -532,7 +531,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 					const timeout = beaverStatus.state == "arriving" ? choppingTime : waitingTime;
 					setBeaverStatus({...beaverStatus, state, x, y, timeout});
 					if (state === "chopping") {
-						sound.play("BeaverEatsTree");
+						Sounds.BeaverEatsTree.play();
 					}
 				} else {
 					setBeaverStatus({...beaverStatus, x, y});
@@ -552,7 +551,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		case "chopping":
 		case "leaving":
 		case "arriving":
-			sound.play("BeaverScared");
+			Sounds.BeaverScared.play();
 			setBeaverStatus({...beaverStatus, state: "scared", dest: {x: -500, y: beaverY}, timeout: 0});
 			break;
 		}
@@ -577,7 +576,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		const x = beeHive.x * Math.cos(a) - beeHive.y * Math.sin(a);
 		const y = beeHive.y * Math.cos(a) + beeHive.x * Math.sin(a);
 
-		sound.play("BeeHiveReleased");
+		Sounds.BeeHiveReleased.play();
 		setBeeHive({...beeHive, state: "falling", x, y, speed: 30});
 	}
 
@@ -587,8 +586,8 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	useTicker(delta => {
 		const deltaMS = delta * 16.67;
 		if (beeHive.state === "falling" && beeHive.y >= beeHiveLimitY) {
-			sound.play("BeeHiveDrops");
-			sound.play("Bear");
+			Sounds.BeeHiveDrops.play();
+			Sounds.Bear.play();
 			setBeeHive({...beeHive, state: "fallen", y: beeHiveFallenY, timeout: bearAppearDuration, flipped: angle < 0})
 			scareAllBirds();
 			scareBeaver();
@@ -622,7 +621,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 
 	const [owl, setOwl] = React.useState({state: "watching"});
 	const owlTrigger = () => {
-		sound.play("Owl");
+		Sounds.Owl.play();
 		setOwl({state: "hidden"});
 
 		[...new Array(5).keys()].forEach(() => addBird(undefined, true));

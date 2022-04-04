@@ -1,8 +1,7 @@
 import * as React from "react";
-import { Container, Text, Sprite } from "react-pixi-fiber/index.js";
-import {Textures} from "./Loader";
+import { Container, Sprite } from "react-pixi-fiber/index.js";
+import {Textures, Sounds} from "./Loader";
 import Tree from "./Tree";
-import { sound } from '@pixi/sound';
 import useButton from "@hooks/useButton";
 import useLocalTime from "@hooks/useLocalTime";
 import useTicker from "@hooks/useTicker";
@@ -62,13 +61,13 @@ const MainScreen = () => {
 	const gameOver = () => {
 		if (!isGameOver) {
 			setIsGameOver(true);
-			sound.play("TreeCrashes");
+			Sounds.TreeCrashes.play();
 			setHighScore(highScore => Math.max(highScore, score));
 		}
 	};
 
 	const newGame = () => {
-		sound.play("StartButton");
+		Sounds.StartButton.play();
 		setAttempt(attempt => attempt + 1);
 		setTimeout(() => {
 			setIsGameOver(false);

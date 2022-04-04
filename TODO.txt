@@ -1,8 +1,7 @@
 Programming tasks
 -----------------
 
-- Preload sounds
-- Add music and music button
+- Add music and mute button
 - Clicking owl when one side has no branches makes birds fly across the screen
 
 Done:
@@ -29,6 +28,7 @@ X Birds should come from the side/above no matter the angle of the tree
 X Make branches fall much faster
 X Ease for tree falling
 X Have the tree fall faster if there is no branch on one side
+X Preload sounds
 
 Graphical tasks
 ---------------
