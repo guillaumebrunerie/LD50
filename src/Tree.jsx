@@ -515,13 +515,14 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	}
 
 	const beeHiveAcceleration = 0.5;
-	const [beeHive, setBeeHive] = React.useState({state: "attached", x: 150, y: -300, speed: 0, timeout: 0, angle: 0});
-
-	const reAttachBeeHive = branch => {
+	const [beeHive, setBeeHive] = React.useState(() => {
+		const branch = branches.find(b => b.id == 2);
 		const a = branch.angle1 * Math.PI/180;
 		const distance = 100;
-		setBeeHive({...beeHive, x: branch.x + Math.cos(a) * distance, y: branch.y + Math.sin(a) * distance})
-	}
+		const x = - (branch.x + Math.cos(a) * distance);
+		const y = branch.y + Math.sin(a) * distance;
+		return {state: "attached", x, y, speed: 0, timeout: 0, angle: 0}
+	});
 
 	const dropBeeHive = () => {
 		if (beeHive.state !== "attached") {
