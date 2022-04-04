@@ -168,12 +168,12 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			setBeeHive({state: "gone", y: -2000});
 		} else {
 			setTimeout(() => {
-				addBird(undefined, true);
-				addBird(undefined, true);
+				addBird(1);
+				addBird(-1);
 			}, 1000);
 			setTimeout(() => {
-				addBird(undefined, true);
-				addBird(undefined, true);
+				addBird(1);
+				addBird(-1);
 			}, 1500);
 		}
 	});
@@ -402,7 +402,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	// 	}
 	// }
 
-	const branchAcceleration = 0.5;
+	const branchAcceleration = 0;
 
 	useTicker(delta => {
 		setBranches(branches.map(branch => {
@@ -428,7 +428,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		const angle2 = branch.angle2 + (branch.flipX ? -1 : 1) * angle;
 
 		const branch1 = {...branch, state: 3};
-		const branch2 = {...branch, id: branch.id + 100, x, y, dropping: true, state: 3, angle1, angle2, speed: 3};
+		const branch2 = {...branch, id: branch.id + 100, x, y, dropping: true, state: 3, angle1, angle2, speed: 40};
 
 		setBranches(branches.flatMap(b => b === branch ? [branch1, branch2] : [b]))
 		scareBirds(branch.id);
