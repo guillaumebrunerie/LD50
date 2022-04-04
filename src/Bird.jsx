@@ -13,7 +13,6 @@ const Bird = ({ bird: { state, x, y, size, color, branch }, onClick }) => {
 			<AnimatedSprite loop={Animations[`Bird_${size}_FlyingLoop`]} anchor={[0.5, anchorY]} x={x} y={y} interactive buttonMode pointerdown={onClick} />
 		);
 	} else {
-		debugger;
 		const loop = {at: () => Textures[`Bird_${size}_Land`].get(`Bird_${size}_Land_025`)};
 		return (
 			<>
