@@ -150,13 +150,7 @@ const getBranchAngles = () => {
 
 const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
-	const [speed, setSpeedRaw] = React.useState(0);
-	const setSpeed = setter => {
-		if (Math.abs(angle) >= limitAngle) {
-			return;
-		}
-		setSpeedRaw(setter);
-	};
+	const [speed, setSpeed] = React.useState(0);
 	const [branches, setBranches] = React.useState([
 		{id: 1, x: 36, y: -300,  flipX: false, state: 0, ...getBranchAngles(), type: "A"},
 		{id: 2, x: 36, y: -450,  flipX: true,  state: 0, ...getBranchAngles(), type: "B"},
@@ -218,7 +212,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 
 		if (Math.abs(angle) >= 90) {
 			setAngle(90 * angle / Math.abs(angle));
-			setSpeedRaw(0);
+			setSpeed(0);
 			setTreeState(state => ({...state, broken: true}));
 			scareAllBirds();
 			gameOver();
@@ -230,15 +224,19 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		if (newSpeed == 0 && angle !== 0) {
 			newSpeed = angle / Math.abs(angle);
 		}
-		const fallingSpeed = 1 / birdSpeedFactor[treeState.level - 1];
+		const initialFallSpeed = 0.4;
+		const finalFallSpeed = 4;
 		if (angle > limitAngle) {
-			newSpeed = Math.max(newSpeed, fallingSpeed);
+			newSpeed = ((angle - limitAngle) / (90 - limitAngle) * (finalFallSpeed - initialFallSpeed) + initialFallSpeed) / birdSpeedFactor[treeState.level - 1];
+			// newSpeed = Math.max(newSpeed, fallingSpeed);
 		}
 		if (angle < -limitAngle) {
-			newSpeed = Math.min(newSpeed, -fallingSpeed);
+			newSpeed = ((angle + limitAngle) / (limitAngle - 90) * (initialFallSpeed - finalFallSpeed) - initialFallSpeed) / birdSpeedFactor[treeState.level - 1];
+			// newSpeed *= Math.abs(angl)
+			// newSpeed = Math.min(newSpeed, -fallingSpeed);
 		}
 
-		setSpeedRaw(newSpeed * birdSpeedFactor[treeState.level - 1]);
+		setSpeed(newSpeed * birdSpeedFactor[treeState.level - 1]);
 		setAngle(angle + delta * speed);
 	});
 
@@ -450,7 +448,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	// const holdBranch = branch => () => {
 	// 	const deltaSpeed = (0.5 + Math.random() / 2) * branchSpeed;
 	// 	// setAngle(branch.flipX ? angle - 5 : angle + 5);
-	// 	// setSpeedRaw(branch.flipX ? speed - deltaSpeed : speed + deltaSpeed);
+	// 	// setSpeed(branch.flipX ? speed - deltaSpeed : speed + deltaSpeed);
 	// 	const brokenBranches = breakBranch(branch);
 	// 	setBranches(branches.flatMap(b => b === branch ? brokenBranches : [b]))
 	// 	scareBirds(branch.id);
@@ -576,7 +574,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		} else if (beeHive.state == "grabbing") {
 			const timeout = beeHive.timeout - deltaMS;
 			if (timeout > 0) {
-				setSpeedRaw(0);
+				setSpeed(0);
 				setAngle(timeout / bearStraightenDuration * beeHive.angle);
 				setBeeHive({...beeHive, timeout});
 			} else {

@@ -3,7 +3,6 @@ Programming tasks
 
 X Ease for tree falling
 X Have the tree fall faster if there is no branch on one side
-- Make branches fall much faster
 
 - Clicking owl when one side has no branches makes birds fly across the screen
 - Preload sounds
@@ -30,6 +29,7 @@ X Add sound triggers
 X Timer keeps counting when game is paused
 X Birds sometimes land on non-existing branches
 X Birds should come from the side/above no matter the angle of the tree
+X Make branches fall much faster
 
 Graphical tasks
 ---------------
