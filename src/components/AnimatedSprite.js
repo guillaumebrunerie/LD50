@@ -8,9 +8,14 @@ const AnimatedSprite = (props) => {
 	const {t} = useLocalTime();
 
 	const anim = (start && t <= start.duration) ? start : loop;
+	if (!anim) {
+		return null;
+	}
+
+	const texture = anim.at ? anim.at(t) : anim;
 
 	return (
-		<Sprite texture={anim.at(t)} {...rest}/>
+		<Sprite texture={texture} {...rest}/>
 	)
 }
 

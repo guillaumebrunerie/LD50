@@ -1,12 +1,12 @@
 import * as React from "react";
-import * as PIXI from "pixi.js"
-import { Container, Sprite, Text, usePixiTicker } from "react-pixi-fiber/index.js";
+import { Container, Sprite } from "react-pixi-fiber/index.js";
 import { findPosition, Branch } from "./Branch";
 import Circle from "./components/Circle";
 import Rectangle from "./components/Rectangle";
 import { Textures, Animations } from "./Loader";
 import { useInterval } from "./useInterval";
 import useLocalTime from "./hooks/useLocalTime";
+import useTicker from "./hooks/useTicker";
 import { sound } from '@pixi/sound';
 import Bird from "./Bird";
 import Beaver from "./Beaver";
@@ -92,22 +92,21 @@ const Trunk = ({state: {level, broken}}) => {
 	);
 };
 
-const BeeHive = ({active, onClick, ...props}) => {
+const BeeHive = ({beeHive: {state, x, y}, active, onClick, ...props}) => {
 	onClick = active && onClick;
-	return <Sprite texture={Textures.BeeHive} anchor={[0.5, 0]} buttonMode={!!onClick} interactive={!!onClick} pointerdown={onClick} {...props}/>
+
+	if (state === "attached") {
+		return <Sprite texture={Textures.BeeHive} anchor={[0.5, 0]} buttonMode={!!onClick} interactive={!!onClick} pointerdown={onClick} x={x} y={y} {...props}/>;
+	} else if (state === "falling") {
+		return (
+			<AnimatedSprite key={1} start={Animations["BeeHive_Start"]} anchor={[0.5, 0]} loop={Textures.BeeHiveLoop} x={x} y={y} {...props}/>
+		)
+	} else {
+		return (
+			<AnimatedSprite key={2} start={Animations["BeeHive_End"]} anchor={[0.5, 0]} x={x} y={y} {...props}/>
+		)
+	}
 }
-
-const useTicker = (callback) => {
-	const tickerRef = React.useRef(() => {});
-
-	React.useLayoutEffect(() => {
-		tickerRef.current = callback;
-	}, [callback]);
-
-	usePixiTicker(React.useCallback((...args) => {
-		tickerRef.current(...args);
-	}, []));
-};
 
 const bearAppearDuration = 300;
 const bearStraightenDuration = 700;
@@ -168,15 +167,11 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		} else {
 			setTimeout(() => {
 				addBird(1);
-				setTimeout(() => {
-					addBird(-1);
-				})
+				addBird(-1);
 			}, 1000);
 			setTimeout(() => {
 				addBird(1);
-				setTimeout(() => {
-					addBird(-1);
-				})
+				addBird(-1);
 			}, 1500);
 		}
 	});
@@ -585,7 +580,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 						onClick={breakBranch(branch)}
 					/>
 				))}
-				{beeHive.state === "attached" && <BeeHive x={beeHive.x} y={beeHive.y} angle={-angle} active={Math.abs(angle) <= limitAngle} onClick={dropBeeHive}/>}
+				{beeHive.state === "attached" && <BeeHive beeHive={beeHive} angle={-angle} active={Math.abs(angle) <= limitAngle} onClick={dropBeeHive}/>}
 				{birds.map(bird => (
 					<Bird
 						key={bird.id}
@@ -596,7 +591,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				<TreeFront/>
 				{debugThings.map(({x, y}, i) => <Circle key={i} x={x} y={y}/>)}
 			</Container>
-			{beeHive.state !== "attached" && <BeeHive x={beeHive.x} y={beeHive.y} active={false}/>}
+			{beeHive.state !== "attached" && <BeeHive beeHive={beeHive} active={false}/>}
 			{branches.filter(b => b.dropping).map(branch => (
 				<Branch key={branch.id} branch={branch}/>
 			))}

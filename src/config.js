@@ -11,6 +11,7 @@ export const TextureData = {
 	"Tree": "tree.json",
 	"Owl": "Owl.png",
 	"BeeHive": "BeeHive.png",
+	"BeeHiveLoop": "BeeHive_Loop.png",
 	"Bear": "Bear.png",
 	"WoodShavingsLoop": {
 		file: "WoodShavingsLoop.json",
@@ -79,27 +80,18 @@ export const AnimationData = {
 		start: 12,
 		end: 25,
 	},
-	// "Bird_Big_Idle": {
-	// 	file: "Bird_Big_Land.json",
-	// 	prefix: "Bird_Big_Land",
-	// 	fps: 25,
-	// 	start: 25,
-	// 	end: 25,
-	// },
-	// "Bird_Medium_Idle": {
-	// 	file: "Bird_Medium_Land.json",
-	// 	prefix: "Bird_Medium_Land",
-	// 	fps: 25,
-	// 	start: 25,
-	// 	end: 25,
-	// },
-	// "Bird_Small_Idle": {
-	// 	file: "Bird_Small_Land.json",
-	// 	prefix: "Bird_Small_Land",
-	// 	fps: 25,
-	// 	start: 25,
-	// 	end: 25,
-	// },
+	"BeeHive_Start": {
+		infix: "_0",
+		fps: 20,
+		start: 0,
+		end: 3,
+	},
+	"BeeHive_End": {
+		infix: "_0",
+		fps: 10,
+		start: 0,
+		end: 12,
+	},
 }
 
 export const SoundData = [
