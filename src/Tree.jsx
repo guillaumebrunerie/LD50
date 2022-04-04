@@ -523,10 +523,10 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		const y = beeHive.y * Math.cos(a) + beeHive.x * Math.sin(a);
 
 		sound.play("BeeHiveReleased");
-		setBeeHive({...beeHive, state: "falling", x, y, speed: 20});
+		setBeeHive({...beeHive, state: "falling", x, y, speed: 30});
 	}
 
-	const beeHiveLimitY = -100;
+	const beeHiveLimitY = -140;
 	const beeHiveFallenY = -50;
 
 	useTicker(delta => {
