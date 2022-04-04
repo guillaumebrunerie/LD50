@@ -526,7 +526,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		setBeeHive({...beeHive, state: "falling", x, y, speed: 20});
 	}
 
-	const beeHiveLimitY = -80;
+	const beeHiveLimitY = -100;
 	const beeHiveFallenY = -50;
 
 	useTicker(delta => {

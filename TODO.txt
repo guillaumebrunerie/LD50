@@ -1,13 +1,12 @@
 Programming tasks
 -----------------
 
-X Birds should come from the side/above no matter the angle of the tree
-X Add music and music button
 X Ease for tree falling
 X Have the tree fall faster if there is no branch on one side
 
-- Clicking owl when one side has no branches makes a lot of bird fly by
-- Check if I can preload sounds
+- Clicking owl when one side has no branches makes birds fly across the screen
+- Preload sounds
+- Add music and music button
 
 Done:
 
@@ -29,6 +28,7 @@ X Fix crash when clicking owl and there is no space
 X Add sound triggers
 X Timer keeps counting when game is paused
 X Birds sometimes land on non-existing branches
+X Birds should come from the side/above no matter the angle of the tree
 
 Graphical tasks
 ---------------
