@@ -9,6 +9,7 @@ X Birds sometimes land on non-existing branches
 - Correct initial position of beehive
 X Check that it works on itch.io
 - Tweak the arriving/leaving behaviour (a bit more birds, a bit more random)
+- Fix crash when clicking owl and there is no space
 
 Done:
 

@@ -1,11 +1,7 @@
 const path = require("path");
-const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
-const isDevelopment = process.env.NODE_ENV !== "production";
-
 module.exports = {
-	mode: isDevelopment ? "development" : "production",
 	entry: "./src/index.jsx",
 	module: {
 		rules: [
@@ -15,7 +11,6 @@ module.exports = {
 				loader: "babel-loader",
 				options: {
 					presets: ["@babel/preset-react"],
-					plugins: isDevelopment ? [require.resolve('react-refresh/babel')] : [],
 				}
 			},
 			{
@@ -35,9 +30,6 @@ module.exports = {
 		path: path.resolve(__dirname, "dist"),
 		filename: "bundle.js",
 	},
-	devServer: {
-		static: "./dist",
-	},
 	plugins: [
 		new CopyPlugin({
 			patterns: [
@@ -45,6 +37,5 @@ module.exports = {
 				{ from: "audio", to: "dist" },
 			],
 		}),
-		...isDevelopment ? [new ReactRefreshWebpackPlugin()] : []
 	],
 };
