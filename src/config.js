@@ -10,6 +10,7 @@ export const TextureData = {
 	"Font": "font.json",
 	"Tree": "tree.json",
 	"Owl": "Owl.png",
+	"OwlIdle": "Owl_Idle.json",
 	"BeeHive": "BeeHive.png",
 	"BeeHiveLoop": "BeeHive_Loop.png",
 	"Bear": "Bear.png",
@@ -94,7 +95,7 @@ export const AnimationData = {
 	},
 	"Owl_Idle": {
 		infix: "_0",
-		fps: 3,
+		fps: 25,
 		start: 0,
 		end: 6,
 	},

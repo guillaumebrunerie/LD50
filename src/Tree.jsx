@@ -73,13 +73,20 @@ const TreeFront = () => {
 	)
 }
 
+const owlIdleDelay = 6000;
+
 const Owl = ({owl, onClick}) => {
 	if (owl.state === "hidden") {
 		return <AnimatedSprite key={1} start={Animations["Owl_Howl"]} scale={1} anchor={0.5} y={owlY}/>
 	}
 
+	const {t} = useLocalTime();
+	const tMod = t % owlIdleDelay;
+	const anim = Animations["Owl_Idle"];
+	const texture = (tMod < anim.duration) ? anim.at(tMod) : Textures["OwlIdle"].get("Owl_Idle_000");
+
 	return (
-		<AnimatedSprite key={0} loop={Animations["Owl_Idle"]} scale={1.2} anchor={0.5} y={owlY} interactive buttonMode pointerdown={onClick}/>
+		<Sprite key={0} texture={texture} scale={1.2} anchor={0.5} y={owlY} interactive buttonMode pointerdown={onClick}/>
 	)
 }
 
