@@ -3,7 +3,7 @@ import { Sprite } from "react-pixi-fiber/index.js";
 import { Textures, Animations } from "./Loader";
 import AnimatedSprite from "@components/AnimatedSprite";
 
-const Beaver = ({ beaver: {x, y, state}, onClick }) => {
+const Beaver = ({ beaver: {x, y, direction, state}, onClick }) => {
 	let loop, start;
 
 	if (state == "arriving") {
@@ -18,7 +18,17 @@ const Beaver = ({ beaver: {x, y, state}, onClick }) => {
 		return null;
 	}
 
-	return <AnimatedSprite key={state} start={start} loop={loop} anchor={[0.5, 0]} x={x} y={-y}/>
+	return (
+		<AnimatedSprite
+			key={state}
+			start={start}
+			loop={loop}
+			anchor={[0.5, 0]}
+			scale={[direction, 1]}
+			x={x * direction}
+			y={-y}
+		/>
+	)
 };
 
 export default Beaver;

@@ -422,7 +422,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const beaverY = 180;
 	const beaverX = 110;
 	// state: "hidden", "arriving", "chopping", "leaving"
-	const [beaverStatus, setBeaverStatus] = React.useState({state: "hidden", x: 500, y: beaverY, timeout: waitingTime})
+	const [beaverStatus, setBeaverStatus] = React.useState({state: "hidden", direction: -1, x: 500, y: beaverY, timeout: waitingTime})
 
 	useTicker(delta => {
 		const deltaMS = delta * 16.67;
@@ -432,7 +432,8 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			switch (beaverStatus.state) {
 			case "hidden": {
 				if (!isGameOver) {
-					setBeaverStatus({...beaverStatus, state: "arriving", x: 500, y: beaverY, dest: {x: beaverX, y: beaverY}, timeout: 0});
+					const direction = Math.random() > 0.5 ? -1 : 1;
+					setBeaverStatus({...beaverStatus, state: "arriving", direction, x: 500, y: beaverY, dest: {x: beaverX, y: beaverY}, timeout: 0});
 				}
 				break;
 			}
@@ -450,7 +451,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				if (arrived) {
 					const state = beaverStatus.state == "arriving" ? "chopping" : "hidden";
 					const timeout = beaverStatus.state == "arriving" ? choppingTime : waitingTime;
-					setBeaverStatus({state, x, y, timeout});
+					setBeaverStatus({...beaverStatus, state, x, y, timeout});
 				} else {
 					setBeaverStatus({...beaverStatus, x, y});
 				}
