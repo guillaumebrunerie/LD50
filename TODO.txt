@@ -1,8 +1,6 @@
 Programming tasks
 -----------------
 
-- Add music and mute button
-
 Done:
 
 X Beaver on a random side
@@ -29,6 +27,7 @@ X Ease for tree falling
 X Have the tree fall faster if there is no branch on one side
 X Preload sounds
 X Clicking owl when one side has no branches makes birds fly across the screen
+X Add music and mute button
 
 Graphical tasks
 ---------------
