@@ -28,7 +28,7 @@ const loadTextures = (callback) => {
 	});
 
 	const soundLoader = new PIXI.Loader();
-	SoundData.forEach(key => {
+	Object.entries(SoundData).forEach(([key]) => {
 		soundLoader.add(key, `./dist/${key}.mp3`);
 	});
 
@@ -49,8 +49,11 @@ const loadTextures = (callback) => {
 		});
 
 		soundLoader.load((_, resources) => {
-			SoundData.forEach(key => {
+			Object.entries(SoundData).forEach(([key, value]) => {
 				Sounds[key] = resources[key].sound;
+				if (value.loop) {
+					Sounds[key].loop = true;
+				}
 			});
 			callback();
 		});

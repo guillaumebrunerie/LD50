@@ -35,12 +35,12 @@ Graphical tasks
 
 Animations:
 X Owl animation
-- Bear animations
+X Bear animations
 - Tree breaking animation (flash at the base when the tree falls)
-- Branch hitting the ground animation
+X Branch hitting the ground animation
 
 Assets:
-- Background + tree
-- Logo
-- Sound button
+X Background + tree
+X Logo
+- Mute button
 - Design of start/gameover screen

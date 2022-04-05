@@ -46,10 +46,24 @@ const CustomText = ({text, ...props}) => {
 	return result;
 };
 
+const useOnMount = (callback) => {
+	const [alreadyCalled, setAlreadyCalled] = React.useState(false);
+	React.useLayoutEffect(() => {
+		if (!alreadyCalled) {
+			callback();
+			setAlreadyCalled(true);
+		}
+	});
+};
+
 const MainScreen = () => {
 	const [isGameOver, setIsGameOver] = React.useState(true);
 	const [attempt, setAttempt] = React.useState(0);
 	const [highScore, setHighScore] = React.useState(0);
+
+	useOnMount(() => {
+		Sounds.Music.play();
+	})
 
 	const [score, setScore] = React.useState(0);
 	useTicker(delta => {
