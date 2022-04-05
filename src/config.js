@@ -1,4 +1,6 @@
 export const TextureData = {
+	"SoundOn": "Sound_On.png",
+	"SoundOff": "Sound_Off.png",
 	"StartBtnDefault": "StartBtnDefault.png",
 	"StartBtnOn": "StartBtnOn.png",
 	"Logo": "Logo.png",

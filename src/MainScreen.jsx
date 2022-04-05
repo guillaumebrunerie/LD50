@@ -57,6 +57,14 @@ const useOnMount = (callback) => {
 	});
 };
 
+const SoundButton = () => {
+	const toggleSound = () => {
+		sound.volumeAll = 1-sound.volumeAll;
+	}
+
+	return <Sprite texture={sound.volumeAll === 1 ? Textures.SoundOn : Textures.SoundOff} anchor={[1,0]} x={700} y={20} buttonMode interactive pointerdown={toggleSound}/>
+}
+
 const MainScreen = () => {
 	const [isGameOver, setIsGameOver] = React.useState(true);
 	const [attempt, setAttempt] = React.useState(0);
@@ -119,6 +127,7 @@ const MainScreen = () => {
 			{isGameOver && <Sprite texture={Textures.Logo} x={360} y={450} anchor={0.5}/>}
 			{isGameOver && score > 0 && <CustomText x={10} y={90} text={`HIGHSCORE: ${toTxt(highScore)}`}/>}
 			{isGameOver && <StartButton onClick={newGame}/>}
+			<SoundButton/>
 		</Container>
 	);
 };
