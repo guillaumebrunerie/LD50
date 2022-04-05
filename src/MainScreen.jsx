@@ -115,10 +115,7 @@ const MainScreen = () => {
 	return (
 		<Container>
 			<Sprite texture={Textures.Bg} x={0} y={0}/>
-			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={previousTreeX - 400} y={1280}/>
-			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={treeX - 400} y={1280}/>
-			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={treeX - 1100} y={1280}/>
-			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={treeX - 1800} y={1280}/>
+			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={treeX - levelDistance / 2} y={1280}/>
 			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={previousTreeX} y={1280}/>
 			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={treeX} y={1280}/>
 			<Tree key={attempt - 1} isGameOver={true} gameOver={() => {}} x={previousTreeX} y={1280 - 115}/>
