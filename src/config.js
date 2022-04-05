@@ -154,6 +154,6 @@ export const SoundData = {
 	"TreeCrashes": {},
 	"Music": {
 		loop: true,
-		volume: 0.3,
+		// volume: 0.3,
 	},
 }

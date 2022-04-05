@@ -6,6 +6,7 @@ import useButton from "@hooks/useButton";
 import useLocalTime from "@hooks/useLocalTime";
 import useTicker from "@hooks/useTicker";
 import * as PIXI from "pixi.js";
+import {sound} from "@pixi/sound";
 
 const StartButton = ({onClick}) => {
 	const {isActive, props} = useButton({onClick});
@@ -74,6 +75,7 @@ const MainScreen = () => {
 
 	const gameOver = () => {
 		if (!isGameOver) {
+			Sounds.Music.volume = 0.6;
 			setIsGameOver(true);
 			Sounds.TreeCrashes.play();
 			setHighScore(highScore => Math.max(highScore, score));
@@ -81,6 +83,7 @@ const MainScreen = () => {
 	};
 
 	const newGame = () => {
+		Sounds.Music.volume = 0.2;
 		Sounds.StartButton.play();
 		setAttempt(attempt => attempt + 1);
 		setTimeout(() => {

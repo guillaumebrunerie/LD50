@@ -331,7 +331,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 
 	const randomDestination = (dir) => {
 		const a = angle * Math.PI/180;
-		const x = dir * 500;
+		const x = dir * (500 + Math.random() * 100);
 		const y = -800 - 400 * Math.random();
 		return {x: x * Math.cos(a) + y * Math.sin(a), y: - x * Math.sin(a) + y * Math.cos(a) }
 	};
@@ -377,14 +377,24 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				}
 			}
 
+			const size = ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];
+			const id = Math.random();
+
 			const dest = findPosition(branches, birds, side)
 			if (!dest) {
-				return birds;
+				side = Math.random() < 0.5 ? -1 : 1;
+				const newBird = {
+					id,
+					size,
+					...randomDestination(side),
+					dest: randomDestination(-side),
+					state: "leaving",
+				}
+				return [...birds, newBird];
 			}
-			const size = ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];
 			Sounds["Chirp" + size].play();
 			const newBird = {
-				id: Math.random(),
+				id,
 				size,
 				...randomDestination(dest.x / Math.abs(dest.x)),
 				dest,
