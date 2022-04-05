@@ -52,11 +52,10 @@ const loadTextures = (callback) => {
 		soundLoader.load((_, resources) => {
 			Object.entries(SoundData).forEach(([key, value]) => {
 				Sounds[key] = resources[key].sound;
-				if (value.loop) {
-					Sounds[key].loop = true;
-				}
-				if (value.volume) {
-					Sounds[key].volume = value.volume;
+				for (const k in value) {
+					if (k !== "file") {
+						Sounds[key][k] = value[k];
+					}
 				}
 			});
 			callback();

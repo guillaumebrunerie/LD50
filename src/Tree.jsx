@@ -350,6 +350,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	}
 
 	const removeBird = (bird, dirFactor = 1) => {
+		Sounds["Chirp" + bird.size].play();
 		setBirds(birds => (
 			birds.map(b => b === bird ? {...b, state: "leaving", dest: randomDestination(b.x / Math.abs(b.x) * dirFactor)} : b)
 		));
@@ -380,12 +381,11 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 			if (!dest) {
 				return birds;
 			}
-			const randomColor = () => Math.floor(Math.random() * 3) + 1;
-			const randomSize = () => ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];
+			const size = ["Small", "Medium", "Big"][Math.floor(Math.random() * 3)];
+			Sounds["Chirp" + size].play();
 			const newBird = {
 				id: Math.random(),
-				color: randomColor(),
-				size: randomSize(),
+				size,
 				...randomDestination(dest.x / Math.abs(dest.x)),
 				dest,
 				state: "flying",
@@ -395,7 +395,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	};
 
 	const flipBird = bird => () => {
-		Sounds["Chirp" + bird.size].play();
+		Sounds.BirdFly.play();
 		const newPosition = findPosition(branches, birds, -bird.x);
 		if (!newPosition) {
 			removeBird(bird, -1);

@@ -133,20 +133,27 @@ export const SoundData = {
 	"BeeHiveReleased": {},
 	"BranchBreaks": {},
 	"BranchDrops": {},
+	"BirdFly": {
+		volume: 0.4,
+		singleInstance: true,
+	},
 	"ChirpSmall": {
 		file: "Bird tweets _1",
+		singleInstance: true,
 	},
 	"ChirpMedium": {
 		file: "Bird tweets _2",
+		singleInstance: true,
 	},
 	"ChirpBig": {
 		file: "Bird tweets _3",
+		singleInstance: true,
 	},
 	"Owl": {},
 	"StartButton": {},
 	"TreeCrashes": {},
 	"Music": {
 		loop: true,
-		volume: 0.5,
+		volume: 0.3,
 	},
 }
