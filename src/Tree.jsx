@@ -165,9 +165,9 @@ const BearFront = ({flipped, state, ...props}) => {
 // 	)
 // }
 
-const getBranchAngles = () => {
+const getBranchAngles = (up = false) => {
 	const getAngle = () => (Math.random() > 0.5 ? -1 : 1) * (20 + Math.random() * 30);
-	const angle1 = getAngle();
+	const angle1 = up ? -Math.abs(getAngle()) : getAngle();
 	const deltaAngle = Math.abs(getAngle());
 	const angle2 = angle1 > 0 ? angle1 - deltaAngle : angle1 + deltaAngle;
 	return {angle1, angle2};
@@ -177,7 +177,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const [angle, setAngle] = React.useState(0);
 	const [speed, setSpeed] = React.useState(0);
 	const [branches, setBranches] = React.useState([
-		{id: 1, x: 36, y: -300,  flipX: false, state: 0, ...getBranchAngles(), type: "A"},
+		{id: 1, x: 36, y: -300,  flipX: false, state: 0, ...getBranchAngles(true), type: "A"},
 		{id: 2, x: 36, y: -450,  flipX: true,  state: 0, ...getBranchAngles(), type: "B"},
 		{id: 3, x: 36, y: -600,  flipX: false, state: 0, ...getBranchAngles(), type: "C"},
 		{id: 4, x: 36, y: -750,  flipX: true,  state: 0, ...getBranchAngles(), type: "A"},
