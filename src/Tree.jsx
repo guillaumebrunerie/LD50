@@ -395,7 +395,7 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	};
 
 	const flipBird = bird => () => {
-		Sounds.Chirp.play();
+		Sounds["Chirp" + bird.size].play();
 		const newPosition = findPosition(branches, birds, -bird.x);
 		if (!newPosition) {
 			removeBird(bird, -1);
