@@ -125,7 +125,9 @@ export const AnimationData = {
 
 export const SoundData = {
 	"Bear": {},
-	"BeaverEatsTree": {},
+	"BeaverEatsTree": {
+		volume: 5,
+	},
 	"BeaverEnters": {},
 	"BeaverAteTree": {},
 	"BeaverScared": {},
