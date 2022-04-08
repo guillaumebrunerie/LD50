@@ -1,12 +1,14 @@
 import * as React from "react";
-import { Container, Sprite } from "react-pixi-fiber/index.js";
+import * as PIXI from "pixi.js";
+import {sound} from "@pixi/sound";
 import {Textures, Sounds} from "./Loader";
-import Tree from "./Tree";
+import { Container, Sprite } from "react-pixi-fiber/index.js";
 import useButton from "@hooks/useButton";
 import useLocalTime from "@hooks/useLocalTime";
 import useTicker from "@hooks/useTicker";
-import * as PIXI from "pixi.js";
-import {sound} from "@pixi/sound";
+import useOnMount from "@hooks/useOnMount";
+
+import Tree from "./Tree";
 
 const StartButton = ({onClick}) => {
 	const {isActive, props} = useButton({onClick});
@@ -45,16 +47,6 @@ const CustomText = ({text, ...props}) => {
 		x += (texture.width + kerning) * scale;
 	});
 	return result;
-};
-
-const useOnMount = (callback) => {
-	const [alreadyCalled, setAlreadyCalled] = React.useState(false);
-	React.useLayoutEffect(() => {
-		if (!alreadyCalled) {
-			callback();
-			setAlreadyCalled(true);
-		}
-	});
 };
 
 const SoundButton = () => {
@@ -110,7 +102,6 @@ const MainScreen = () => {
 	const previousTreeX = treeX - levelDistance;
 
 	const toTxt = score => score.toFixed(1);
-	// const scoreTxT = isGameOver ? `${lastScore}` : `${((Date.now() - startTime) / 1000).toFixed(1)}`
 	const groundY = 1350;
 
 	return (

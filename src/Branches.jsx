@@ -1,10 +1,10 @@
 import * as React from "react";
+import { Textures, Animations, Sounds } from "./Loader";
 import { Container, Sprite } from "react-pixi-fiber/index.js";
 import Rectangle from "./components/Rectangle";
 import AnimatedSprite from "./components/AnimatedSprite";
-import { Textures, Animations } from "./Loader";
+import useTicker from "./hooks/useTicker";
 
-// const branchDeltaX = 36;
 const branchDeltaX2 = 9;
 const branchDeltaY3 = {
 	"A": -7,
@@ -29,7 +29,7 @@ const anchors3 = {
 
 const margin = 20;
 
-export const Branch = ({ branch: { x, y, flipX, dropping, state, angle1, angle2, type, dropped }, onClick }) => {
+const Branch = ({ branch: { x, y, flipX, dropping, state, angle1, angle2, type, dropped }, onClick }) => {
 	if (dropped) {
 		return (
 			<Container scale={[flipX ? -1 : 1, 1]}>
@@ -83,6 +83,23 @@ export const Branch = ({ branch: { x, y, flipX, dropping, state, angle1, angle2,
 	);
 };
 
+export const BranchesAttached = ({branches, breakBranch}) => {
+	return branches.filter(b => !b.dropping).map(branch => (
+		<Branch
+			key={branch.id}
+			branch={branch}
+			onClick={breakBranch(branch)}
+		/>
+	));
+}
+
+export const BranchesDetached = ({branches}) => {
+	return branches.filter(b => b.dropping).map(branch => (
+		<Branch key={branch.id} branch={branch}/>
+	));
+}
+
+
 const birdDistanceSquared = 50*50;
 
 export const findPosition = (branches, birds, sign = 0) => {
@@ -131,3 +148,63 @@ export const findPosition = (branches, birds, sign = 0) => {
 	} while (tries <= 100);
 	return null;
 };
+
+const getBranchAngles = (up = false) => {
+	const getAngle = () => (Math.random() > 0.5 ? -1 : 1) * (20 + Math.random() * 30);
+	const angle1 = up ? -Math.abs(getAngle()) : getAngle();
+	const deltaAngle = Math.abs(getAngle());
+	const angle2 = angle1 > 0 ? angle1 - deltaAngle : angle1 + deltaAngle;
+	return {angle1, angle2};
+}
+
+export const useBranches = ({angle, scareBirds, scareBeaver, dropBeeHive}) => {
+	const [branches, setBranches] = React.useState([
+		{id: 1, x: 36, y: -300,  flipX: false, state: 0, ...getBranchAngles(true), type: "A"},
+		{id: 2, x: 36, y: -450,  flipX: true,  state: 0, ...getBranchAngles(), type: "B"},
+		{id: 3, x: 36, y: -600,  flipX: false, state: 0, ...getBranchAngles(), type: "C"},
+		{id: 4, x: 36, y: -750,  flipX: true,  state: 0, ...getBranchAngles(), type: "A"},
+		{id: 5, x: 36, y: -900,  flipX: false, state: 0, ...getBranchAngles(), type: "B"},
+		{id: 6, x: 36, y: -1050, flipX: true,  state: 0, ...getBranchAngles(), type: "C"},
+	]);
+
+	const branchAcceleration = 0;
+	const branchDropY = 60;
+
+	useTicker(delta => {
+		setBranches(branches.map(branch => {
+			if (!branch.dropping || branch.dropped) {
+				return branch;
+			}
+			const dropped = branch.y > branchDropY;
+			if (dropped) {
+				Sounds.BranchDrops.play();
+				scareBeaver();
+			}
+			const y = dropped ? branchDropY : branch.y + branch.speed;
+			return {...branch, dropped, y, speed: branch.speed + branchAcceleration * delta}
+		}));
+	});
+
+	const breakBranch = branch => () => {
+		const a = angle * Math.PI/180;
+		const origX = branch.x * (branch.flipX ? -1 : 1);
+		const origY = branch.y;
+		const x = (origX * Math.cos(a) - origY * Math.sin(a)) * (branch.flipX ? -1 : 1);
+		const y = origY * Math.cos(a) + origX * Math.sin(a);
+		const angle1 = branch.angle1 + (branch.flipX ? -1 : 1) * angle;
+		const angle2 = branch.angle2 + (branch.flipX ? -1 : 1) * angle;
+
+		const branch1 = {...branch, state: 3};
+		const branch2 = {...branch, id: branch.id + 100, x, y, dropping: true, state: 3, angle1, angle2, speed: 40};
+
+		setBranches(branches.flatMap(b => b === branch ? [branch1, branch2] : [b]))
+		scareBirds(branch.id);
+		Sounds.BranchBreaks.play();
+
+		if (branch.id === 2) {
+			dropBeeHive();
+		}
+	}
+
+	return {branches, breakBranch};
+}

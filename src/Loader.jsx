@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import * as PIXI from "pixi.js";
 import { sound } from '@pixi/sound';
 

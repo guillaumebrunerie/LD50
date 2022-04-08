@@ -1,8 +1,8 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 import {Stage} from "react-pixi-fiber/index.js";
-
 import {Loader} from "./Loader";
+
 import App from "./App";
 
 const width = 720;
