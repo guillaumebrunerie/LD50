@@ -1,3 +1,25 @@
+TODO:
+-----
+
+- Beehive regrows (animation with bees reconstructing the beehive)
+- Branches regrow
+- Squirrels arrive and leave, and heal the tree if we click on it
+- 5 levels of tree
+- Owl calls woodpecker
+- Worm appears and when we click on it it goes to a bird that whistles and calls other birds
+- Fix size of bear images
+- At the last tree level, the beaver hits the tree with its tail
+- Music less loud
+- Onboarding
+
+- Naming convention: 
+BirdBigFlyingLoop_001.png
+No underscores in base name, always underscore before frame number, three digits for frame number.
+
+
+
+
+
 Programming tasks
 -----------------
 
