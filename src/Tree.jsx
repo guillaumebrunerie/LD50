@@ -38,19 +38,22 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		return weight;
 	}
 
-	const {tree, chopTree, angle, setAngle, setSpeed, limitAngle} = useTree({
-		isGameOver,
-		gameOver,
-		scareAllBirds: (...args) => scareAllBirds(...args),
-		currentWeight,
-	});
-	const {beaver, scareBeaver} = useBeaver({isGameOver, tree, chopTree});
-	const {branches, breakBranch} = useBranches({
+	const {
+		tree,
+		chopTree,
 		angle,
-		scareBirds: (...args) => scareBirds(...args),
+		setAngle,
+		setSpeed,
+		limitAngle,
+	} = useTree({isGameOver, gameOver, scareAllBirds: (...args) => scareAllBirds(...args), currentWeight});
+	const {
+		beaver,
 		scareBeaver,
-		dropBeeHive: (...args) => dropBeeHive(...args),
-	});
+	} = useBeaver({isGameOver, tree, chopTree});
+	const {
+		branches,
+		breakBranch,
+	} = useBranches({angle, scareBirds: (...args) => scareBirds(...args), scareBeaver, dropBeeHive: (...args) => dropBeeHive(...args)});
 	const {
 		birds,
 		flipBird,
@@ -59,8 +62,15 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		scareAllBirds,
 		scareBirds,
 	} = useBirds({branches, isGameOver, angle, currentWeight});
-	const {owl, owlTrigger} = useOwl({addOwlBirds});
-	const {beeHive, setHiddenBeeHive, dropBeeHive} = useBeeHiveAndBear({branches, scareAllBirds, scareBeaver, setSpeed, angle, setAngle});
+	const {
+		owl,
+		owlTrigger,
+	} = useOwl({addOwlBirds});
+	const {
+		beeHive,
+		setHiddenBeeHive,
+		dropBeeHive,
+	} = useBeeHiveAndBear({branches, scareAllBirds, scareBeaver, setSpeed, angle, setAngle});
 
 	useOnMount(() => {
 		if (isFirstScreen) {
