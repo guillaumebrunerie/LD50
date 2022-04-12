@@ -1,10 +1,21 @@
 import * as React from "react";
 import * as PIXI from "pixi.js";
-import { sound } from '@pixi/sound';
 
 import {TextureData, AnimationData, SoundData} from "./config";
 
+if (import.meta.webpackHot) {
+	import.meta.webpackHot.accept("./config", () => {
+		PIXI.Loader.shared.reset();
+		loadTextures(() => {
+			loadAnimations();
+		});
+	})
+}
+
+
 export const Textures = {};
+export const Animations = {}
+export const Sounds = {};
 
 const getSpriteSheet = resource => ({
 	get: (name) => {
@@ -13,8 +24,6 @@ const getSpriteSheet = resource => ({
 		return sheet.textures[index];
 	}
 });
-
-export const Sounds = {};
 
 const loadTextures = (callback) => {
 	const loader = PIXI.Loader.shared;
@@ -76,8 +85,6 @@ const getAnimation = (value) => {
 	return {at, duration};
 }
 
-export const Animations = {}
-
 const loadAnimations = () => {
 	Object.entries(TextureData).forEach(([key, value]) => {
 		Object.entries(value.animations || {}).forEach(([animKey, animation]) => {
@@ -89,6 +96,7 @@ const loadAnimations = () => {
 	})
 };
 
+
 export const Loader = ({children}) => {
 	const [isLoading, setIsLoading] = React.useState(true);
 
@@ -98,13 +106,4 @@ export const Loader = ({children}) => {
 	}), []);
 
 	return isLoading ? null : children;
-}
-
-if (import.meta.webpackHot) {
-	import.meta.webpackHot.accept("./config", () => {
-		PIXI.Loader.shared.reset();
-		loadTextures(() => {
-			loadAnimations();
-		});
-	})
 }
