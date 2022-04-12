@@ -1,18 +1,23 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
-import {Stage} from "react-pixi-fiber/index.js";
-import {Loader} from "./Loader";
+import {render} from "react-pixi-fiber/index.js";
+import * as PIXI from "pixi.js";
 
+import {Loader} from "./Loader";
 import App from "./App";
 
 const width = 720;
 const height = 1280;
+const canvasElement = document.getElementById("canvas")
+export const app = new PIXI.Application({
+	backgroundColor: 0x10bb99,
+	view: canvasElement,
+	width,
+	height,
+});
 
-ReactDOM.render(
-	<Stage options={{backgroundColor: 0x10bb99, height, width}}>
-		<Loader>
-			<App/>
-		</Loader>
-	</Stage>,
-	document.getElementById("container")
+render(
+	<Loader>
+		<App/>
+	</Loader>,
+	app.stage
 );

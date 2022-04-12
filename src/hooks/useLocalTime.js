@@ -1,22 +1,17 @@
 import * as React from "react";
 import * as PIXI from "pixi.js";
-import {
-	usePixiTicker,
-} from "react-pixi-fiber/index.js";
+import useTicker from "./useTicker";
 
 const useLocalTime = ({factor = 1, callback} = {factor: 1}) => {
 	const [t, setT] = React.useState(0);
-	const [delta, setDelta] = React.useState(0);
-	const tick = React.useCallback(() => {
+	useTicker(() => {
 		setT(t => t + PIXI.Ticker.shared.deltaMS * factor);
-		setDelta(PIXI.Ticker.shared.deltaMS * factor);
 		callback?.(PIXI.Ticker.shared.deltaMS);
-	}, [callback, factor]);
-	usePixiTicker(tick);
+	});
 
-	const reset = React.useCallback(() => setT(0));
+	const reset = React.useCallback(() => setT(0), []);
 
-	return {t, delta, reset};
+	return {t, reset};
 };
 
 export default useLocalTime;
