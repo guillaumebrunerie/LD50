@@ -1,7 +1,7 @@
 import * as React from "react";
 import useTicker from "./useTicker";
 
-const useInterval = (callback, interval) => {
+const useSetInterval = (callback, interval) => {
 	const timeoutRef = React.useRef(interval);
 
 	useTicker(delta => {
@@ -10,7 +10,7 @@ const useInterval = (callback, interval) => {
 			callback();
 			timeoutRef.current = interval;
 		}
-	})
+	});
 };
 
-export default useInterval;
+export default useSetInterval;
