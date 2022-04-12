@@ -3,7 +3,7 @@ import {render} from "react-pixi-fiber/index.js";
 import * as PIXI from "pixi.js";
 
 import {Loader} from "./Loader";
-import MainScreen from "./MainScreen";
+import App from "./App";
 
 const width = 720;
 const height = 1280;
@@ -17,7 +17,7 @@ export const app = new PIXI.Application({
 
 render(
 	<Loader>
-		<MainScreen/>
+		<App/>
 	</Loader>,
 	app.stage
 );

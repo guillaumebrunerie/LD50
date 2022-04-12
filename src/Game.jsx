@@ -13,7 +13,7 @@ const branchWeight = 2;
 const beeHiveWeight = 1;
 const birdWeight = {"Small": 1, "Medium": 2, "Big": 3};
 
-const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
+const Game = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const currentWeight = () => {
 		let weight = 0;
 		// Birds weight
@@ -104,4 +104,4 @@ const Tree = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	);
 };
 
-export default Tree;
+export default Game;

@@ -8,7 +8,7 @@ import useLocalTime from "@hooks/useLocalTime";
 import useTicker from "@hooks/useTicker";
 import useOnMount from "@hooks/useOnMount";
 
-import Tree from "./Tree";
+import Game from "./Game";
 
 const StartButton = ({onClick}) => {
 	const {isActive, props} = useButton({onClick});
@@ -57,7 +57,7 @@ const SoundButton = () => {
 	return <Sprite texture={sound.volumeAll === 1 ? Textures.SoundOn : Textures.SoundOff} anchor={[1,0]} x={700} y={20} buttonMode interactive pointerdown={toggleSound}/>
 }
 
-const MainScreen = () => {
+const App = () => {
 	const [isGameOver, setIsGameOver] = React.useState(true);
 	const [attempt, setAttempt] = React.useState(0);
 	const [highScore, setHighScore] = React.useState(0);
@@ -110,8 +110,8 @@ const MainScreen = () => {
 			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={treeX - levelDistance / 2} y={groundY}/>
 			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={previousTreeX} y={groundY}/>
 			<Sprite texture={Textures.BgGround} anchor={[0.5, 1]} x={treeX} y={groundY}/>
-			<Tree key={attempt - 1} isGameOver={true} gameOver={() => {}} x={previousTreeX} y={1280 - 115}/>
-			<Tree key={attempt} isFirstScreen={attempt == 0} isGameOver={isGameOver} gameOver={gameOver} x={treeX} y={1280 - 115}/>
+			<Game key={attempt - 1} isGameOver={true} gameOver={() => {}} x={previousTreeX} y={1280 - 115}/>
+			<Game key={attempt} isFirstScreen={attempt == 0} isGameOver={isGameOver} gameOver={gameOver} x={treeX} y={1280 - 115}/>
 			<CustomText text={"SCORE: " + toTxt(score)} x={10} y={40}/>
 			{isGameOver && <Sprite texture={Textures.Logo} x={360} y={450} anchor={0.5}/>}
 			{isGameOver && score > 0 && <CustomText x={10} y={90} text={`HIGHSCORE: ${toTxt(highScore)}`}/>}
@@ -121,4 +121,4 @@ const MainScreen = () => {
 	);
 };
 
-export default MainScreen;
+export default App;
