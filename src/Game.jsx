@@ -7,7 +7,7 @@ import {Birds, useBirds} from "./Birds";
 import {Beaver, WoodShavings, useBeaver} from "./Beaver";
 import {BeeHiveAttached, BeeHiveDetached, BearBack, BearFront, useBeeHiveAndBear} from "./BeeHiveAndBear";
 import {OwlBack, OwlFront, useOwl} from "./Owl";
-import {Stump, TrunkBack, Trunk, TreeFront, useTree} from "./Trunk";
+import {Stump, TrunkBack, Trunk, TreeFront, useTree} from "./Tree";
 
 const branchWeight = 2;
 const beeHiveWeight = 1;
