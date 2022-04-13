@@ -57,6 +57,18 @@ const SoundButton = () => {
 	return <Sprite texture={sound.volumeAll === 1 ? Textures.SoundOn : Textures.SoundOff} anchor={[1,0]} x={700} y={20} buttonMode interactive pointerdown={toggleSound}/>
 }
 
+const fadeVolume = (sound, from, to, duration) => {
+	const steps = 10;
+	let step = 0;
+	const interval = setInterval(() => {
+		if (step > steps) {
+			clearInterval(interval);
+		}
+		sound.volume = from + (to - from) * step/steps;
+		step++
+	}, duration / steps);
+}
+
 const App = () => {
 	const [isGameOver, setIsGameOver] = React.useState(true);
 	const [attempt, setAttempt] = React.useState(0);
@@ -75,7 +87,7 @@ const App = () => {
 
 	const gameOver = () => {
 		if (!isGameOver) {
-			Sounds.Music.volume = 0.6;
+			fadeVolume(Sounds.Music, Sounds.Music.lowVolume, Sounds.Music.highVolume, 500);
 			setIsGameOver(true);
 			Sounds.TreeCrashes.play();
 			setHighScore(highScore => Math.max(highScore, score));
@@ -83,7 +95,7 @@ const App = () => {
 	};
 
 	const newGame = () => {
-		Sounds.Music.volume = 0.2;
+		fadeVolume(Sounds.Music, Sounds.Music.highVolume, Sounds.Music.lowVolume, 500);
 		Sounds.StartButton.play();
 		setAttempt(attempt => attempt + 1);
 		setTimeout(() => {

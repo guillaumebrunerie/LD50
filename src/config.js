@@ -158,6 +158,8 @@ export const SoundData = {
 	"TreeCrashes": {},
 	"Music": {
 		loop: true,
-		// volume: 0.3,
+		volume: 0.4,
+		highVolume: 0.4,
+		lowVolume: 0.15,
 	},
 }
