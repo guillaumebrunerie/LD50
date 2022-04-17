@@ -2,7 +2,7 @@ import * as React from "react";
 import * as PIXI from "pixi.js";
 import {sound} from "@pixi/sound";
 import {Textures, Sounds} from "./Loader";
-import { Container, Sprite } from "react-pixi-fiber/index.js";
+import {Container, Sprite} from "react-pixi-fiber/index.js";
 import useButton from "@hooks/useButton";
 import useLocalTime from "@hooks/useLocalTime";
 import useTicker from "@hooks/useTicker";
