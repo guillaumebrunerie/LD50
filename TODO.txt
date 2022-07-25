@@ -55,6 +55,7 @@ Graphical tasks
 ---------------
 
 Animations:
+X Beehive regrows (animation with bees reconstructing the beehive)
 X Owl animation
 X Bear animations
 - Tree breaking animation (flash at the base when the tree falls)
