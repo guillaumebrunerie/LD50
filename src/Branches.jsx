@@ -160,7 +160,7 @@ const getBranchAngles = (up = false) => {
 export const useBranches = ({angle, scareBirds, scareBeaver, dropBeeHive}) => {
 	const [branches, setBranches] = React.useState([
 		{id: 1, x: 36, y: -300,  flipX: false, state: 0, ...getBranchAngles(true), type: "A"},
-		{id: 2, x: 36, y: -450,  flipX: true,  state: 0, ...getBranchAngles(), type: "B"},
+		{id: 2, x: 36, y: -450,  flipX: true,  state: 0, ...getBranchAngles(true), type: "B"},
 		{id: 3, x: 36, y: -600,  flipX: false, state: 0, ...getBranchAngles(), type: "C"},
 		{id: 4, x: 36, y: -750,  flipX: true,  state: 0, ...getBranchAngles(), type: "A"},
 		{id: 5, x: 36, y: -900,  flipX: false, state: 0, ...getBranchAngles(), type: "B"},
