@@ -1,7 +1,7 @@
 TODO:
 -----
 
-- Beehive regrows (animation with bees reconstructing the beehive)
+- Beehive regrows (animation with bees reconstructing the beehive) (20 FPS)
 - Branches regrow
 - Squirrels arrive and leave, and heal the tree if we click on it
 - 5 levels of tree
@@ -55,6 +55,7 @@ Graphical tasks
 ---------------
 
 Animations:
+X Beehive regrows (animation with bees reconstructing the beehive)
 X Owl animation
 X Bear animations
 - Tree breaking animation (flash at the base when the tree falls)
