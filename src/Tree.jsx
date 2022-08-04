@@ -3,18 +3,18 @@ import {Textures} from "./Loader";
 import {Sprite} from "react-pixi-fiber/index.js";
 import useTicker from "./hooks/useTicker";
 
-const stumpY = 37;
+const stumpY = 38;
 const treeY = -37;
 const backgroundY = -830;
 const endY = -52;
 const treeCoronaY = -775;
 
 export const Stump = ({tree: {level, broken}}) => {
-	const endTexture = Textures.Tree.get("TreeEnd_0" + level + ((broken && level <= 2) ? "_Broken" : ""));
+	const endTexture = Textures.Tree.get("TreeEnd_0" + level + (broken ? "_Broken" : ""));
 	return (
 		<>
 			<Sprite texture={Textures.Tree.get("Trunk")} anchor={[0.5, 0]} y={stumpY} />
-			<Sprite texture={endTexture} anchor={[0.5, 0]} y={0} scale={[1, -1]} y={-endY} />
+			<Sprite texture={endTexture} anchor={[0.5, 0]} scale={[1, -1]} y={-endY} />
 		</>
 	);
 };
@@ -29,12 +29,12 @@ export const TrunkBack = () => {
 }
 
 export const Trunk = ({tree: {level, broken}}) => {
-	const endTexture = Textures.Tree.get("TreeEnd_0" + level + ((broken && level <= 2) ? "_Broken" : ""));
+	const endTexture = Textures.Tree.get("TreeEnd_0" + level + (broken ? "_Broken" : ""));
 
 	return (
 		<>
 			<Sprite texture={Textures.Tree.get("Tree")} anchor={[0.5, 1]} y={treeY} />
-			<Sprite texture={endTexture} anchor={[0.5, 0]} y={0} y={endY} />
+			<Sprite texture={endTexture} anchor={[0.5, 0]} y={endY} />
 		</>
 	);
 };
@@ -47,13 +47,13 @@ export const TreeFront = () => {
 	)
 }
 
-const birdSpeedFactor = [0.015, 0.04, 0.06];
+const birdSpeedFactor = [0.01, 0.025, 0.04, 0.055, 0.07];
 const limitAngle = 25; // Max angle before the game is lost
 
 export const useTree = ({isGameOver, gameOver, scareAllBirds, currentWeight}) => {
 	const [angle, setAngle] = React.useState(0);
 	const [speed, setSpeed] = React.useState(0);
-	const [tree, setTree] = React.useState({level: 1, broken: false});
+	const [tree, setTree] = React.useState({level: 1, broken: isGameOver});
 
 	// "Main loop"
 	useTicker(delta => {

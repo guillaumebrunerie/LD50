@@ -64,7 +64,7 @@ export const useBeaver = ({isGameOver, tree, chopTree}) => {
 				break;
 			}
 			case "chopping": {
-				if (!isGameOver && tree.level < 3) {
+				if (!isGameOver && tree.level < 5) {
 					chopTree();
 				}
 				Sounds.BeaverAteTree.play();

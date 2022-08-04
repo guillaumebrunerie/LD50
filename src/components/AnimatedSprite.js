@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import useLocalTime from "@hooks/useLocalTime";
 
 import {Sprite} from "react-pixi-fiber/index.js";

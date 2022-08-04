@@ -51,10 +51,20 @@ const CustomText = ({text, ...props}) => {
 
 const SoundButton = () => {
 	const toggleSound = () => {
-		sound.volumeAll = 1-sound.volumeAll;
+		sound.volumeAll = 1 - sound.volumeAll;
 	}
 
-	return <Sprite texture={sound.volumeAll === 1 ? Textures.SoundOn : Textures.SoundOff} anchor={[1,0]} x={700} y={20} buttonMode interactive pointerdown={toggleSound}/>
+	return (
+		<Sprite
+			texture={sound.volumeAll === 1 ? Textures.SoundOn : Textures.SoundOff}
+			anchor={[1,0]}
+			x={700}
+			y={20}
+			buttonMode
+			interactive
+			pointerdown={toggleSound}
+		/>
+	)
 }
 
 const fadeVolume = (sound, from, to, duration) => {

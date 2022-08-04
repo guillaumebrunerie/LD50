@@ -10,7 +10,11 @@ const move = (from, to, delta, speed) => {
 	if (dist >= totalDist) {
 		return {arrived: true, x: to.x, y: to.y};
 	}
-	return {arrived: false, x: from.x + dist / totalDist * deltaX, y: from.y + dist / totalDist * deltaY};
+	return {
+		arrived: false,
+		x: from.x + dist / totalDist * deltaX,
+		y: from.y + dist / totalDist * deltaY,
+	};
 }
 
 export default move;

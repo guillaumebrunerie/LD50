@@ -13,8 +13,8 @@
     "@babel/preset-react": "^7.16.7",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.4",
     "babel-loader": "^8.2.3",
-    "copy-webpack-plugin": "^10.2.4",
-    "react-refresh": "^0.11.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "react-refresh": "^0.13.0",
     "webpack": "^5.68.0",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.4",
@@ -25,7 +25,7 @@
     "pixi.js": "^6.0.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-pixi-fiber": "^1.0.0-beta.15"
+    "react-pixi-fiber": "^1.0.0-beta.16"
   },
   "description": "Ludum Dare #50"
 }
