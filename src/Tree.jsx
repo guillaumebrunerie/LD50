@@ -47,16 +47,17 @@ export const TreeFront = () => {
 	)
 }
 
-const birdSpeedFactor = [0.01, 0.025, 0.04, 0.055, 0.07];
+const birdSpeedFactor = [0.015, 0.03, 0.045, 0.06, 0.075];
 const limitAngle = 25; // Max angle before the game is lost
 
 export const useTree = ({isGameOver, gameOver, scareAllBirds, currentWeight}) => {
 	const [angle, setAngle] = React.useState(0);
 	const [speed, setSpeed] = React.useState(0);
-	const [tree, setTree] = React.useState({level: 1, broken: isGameOver});
+	const [tree, setTree] = React.useState({level: 1, broken: false});
 
 	// "Main loop"
 	useTicker(delta => {
+		setTree(state => ({...state, broken: isGameOver}));
 		if (isGameOver) {
 			return;
 		}
