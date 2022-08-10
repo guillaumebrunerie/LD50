@@ -30,14 +30,14 @@ export const OwlFront = ({owl}) => {
 	return <AnimatedSprite key={1} start={Animations["Owl_Howl"]} anchor={0.5} y={owlY}/>
 }
 
-export const useOwl = ({addOwlBirds}) => {
+export const useOwl = ({callWoodpecker}) => {
 	const [owl, setOwl] = React.useState({state: "watching"});
 
 	const owlTrigger = () => {
 		Sounds.Owl.play();
 		setOwl({state: "hidden"});
 
-		addOwlBirds();
+		callWoodpecker();
 	}
 
 	return {owl, owlTrigger};

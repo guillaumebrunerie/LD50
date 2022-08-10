@@ -154,10 +154,6 @@ export const useBirds = ({branches, isGameOver, angle, currentWeight}) => {
 		}, 1500);
 	};
 
-	const addOwlBirds = () => {
-		[...new Array(5).keys()].forEach(() => addBird(undefined, true));
-	};
-
 	const flipBird = (bird) => () => {
 		Sounds.BirdFly.play();
 		const newPosition = findPosition(branches, birds, -bird.x);
@@ -168,7 +164,7 @@ export const useBirds = ({branches, isGameOver, angle, currentWeight}) => {
 		setBirds(birds.map(b => b === bird ? {...b, dest: newPosition, state: "flying"} : b));
 	};
 
-	return {birds, flipBird, addInitialBirds, addOwlBirds, scareAllBirds, scareBirds};
+	return {birds, flipBird, addInitialBirds, scareAllBirds, scareBirds};
 }
 
 const anchorY = 0.75;

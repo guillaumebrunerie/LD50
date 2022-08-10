@@ -123,6 +123,30 @@ export const AnimationData = {
 		start: 0,
 		end: 24,
 	},
+	"WoodpeckerFlyingLoop": {
+		infix: "_0",
+		fps: 20,
+		start: 0,
+		end: 14,
+	},
+	"WoodpeckerKnockingLoop": {
+		infix: "_0",
+		fps: 20,
+		start: 0,
+		end: 3,
+	},
+	"WoodpeckerKnockingToFlying": {
+		infix: "_0",
+		fps: 30,
+		start: 0,
+		end: 10,
+	},
+	"WoodpeckerLand": {
+		infix: "_0",
+		fps: 30,
+		start: 0,
+		end: 13,
+	},
 }
 
 export const SoundData = {

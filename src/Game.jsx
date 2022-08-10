@@ -8,6 +8,7 @@ import {Beaver, WoodShavings, useBeaver} from "./Beaver";
 import {BeeHiveAttached, BeeHiveDetached, BearBack, BearFront, useBeeHiveAndBear} from "./BeeHiveAndBear";
 import {OwlBack, OwlFront, useOwl} from "./Owl";
 import {Stump, TrunkBack, Trunk, TreeFront, useTree} from "./Tree";
+import {Woodpecker, useWoodpecker} from "./Woodpecker";
 
 const branchWeight = 2;
 const beeHiveWeight = 1;
@@ -46,26 +47,35 @@ const Game = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		setSpeed,
 		limitAngle,
 	} = useTree({isGameOver, gameOver, scareAllBirds: (...args) => scareAllBirds(...args), currentWeight});
+
 	const {
 		beaver,
 		scareBeaver,
 	} = useBeaver({isGameOver, tree, chopTree});
+
 	const {
 		branches,
 		breakBranch,
 	} = useBranches({angle, scareBirds: (...args) => scareBirds(...args), scareBeaver, dropBeeHive: (...args) => dropBeeHive(...args)});
+
 	const {
 		birds,
 		flipBird,
 		addInitialBirds,
-		addOwlBirds,
 		scareAllBirds,
 		scareBirds,
 	} = useBirds({branches, isGameOver, angle, currentWeight});
+
+	const {
+		woodpecker,
+		callWoodpecker,
+	} = useWoodpecker({setSpeed, angle, setAngle});
+
 	const {
 		owl,
 		owlTrigger,
-	} = useOwl({addOwlBirds});
+	} = useOwl({callWoodpecker});
+
 	const {
 		beeHive,
 		setHiddenBeeHive,
@@ -96,6 +106,7 @@ const Game = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				<Birds birds={birds} flipBird={flipBird} angle={angle}/>
 				<TreeFront/>
 			</Container>
+			<Woodpecker woodpecker={woodpecker}/>
 			<BeeHiveDetached beeHive={beeHive}/>
 			<BranchesDetached branches={branches}/>
 			<WoodShavings beaver={beaver}/>
