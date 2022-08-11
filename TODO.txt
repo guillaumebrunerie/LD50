@@ -2,7 +2,7 @@ TODO:
 -----
 
 - Beehive regrows (animation with bees reconstructing the beehive) (20 FPS)
-- Branches regrow
+- Branches regrow (RegrowingTreeFx - 20 FPS)
 - Squirrels arrive and leave, and heal the tree if we click on it
 - 5 levels of tree
 - Owl calls woodpecker
