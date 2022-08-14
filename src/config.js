@@ -42,6 +42,7 @@ export const TextureData = {
 			"BeaverTransition": {prefix: "BeaverTransition0", start: 12, end: 20},
 		}
 	},
+	"LifeBar": "LifeBar.json",
 };
 
 export const AnimationData = {

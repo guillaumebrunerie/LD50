@@ -5,6 +5,8 @@ import useTicker from "./hooks/useTicker";
 
 const stumpY = 38;
 const treeY = -37;
+const lifeBarY = -70;
+const lifeBarScale = 0.8;
 const backgroundY = -830;
 const endY = -52;
 const treeCoronaY = -775;
@@ -28,13 +30,31 @@ export const TrunkBack = () => {
 	)
 }
 
-export const Trunk = ({tree: {level, broken}}) => {
+const lifeBarsPos = {
+	1: {x: 27, y: 8 - 21},
+	2: {x: 14, y: 4 - 21},
+	3: {x: 0, y: 3 - 21},
+	4: {x: -14, y: 4 - 21},
+	5: {x: -27, y: 8 - 21},
+}
+
+export const Trunk = ({tree: {level, broken}, health}) => {
 	const endTexture = Textures.Tree.get("TreeEnd_0" + level + (broken ? "_Broken" : ""));
+	const d = 1/5 * 1/3;
 
 	return (
 		<>
 			<Sprite texture={Textures.Tree.get("Tree")} anchor={[0.5, 1]} y={treeY} />
 			<Sprite texture={endTexture} anchor={[0.5, 0]} y={endY} />
+			{health < 1 && (
+				<Sprite texture={Textures.LifeBar.get("LifeBarBack")} anchor={[0.5, 1]} y={lifeBarY} scale={lifeBarScale}>
+					{health > 4/5 + d && <Sprite texture={Textures.LifeBar.get("LifeBar_01")} anchor={0.5} x={lifeBarsPos[1].x} y={lifeBarsPos[1].y}/>}
+					{health > 3/5 + d && <Sprite texture={Textures.LifeBar.get("LifeBar_02")} anchor={0.5} x={lifeBarsPos[2].x} y={lifeBarsPos[2].y}/>}
+					{health > 2/5 + d && <Sprite texture={Textures.LifeBar.get("LifeBar_03")} anchor={0.5} x={lifeBarsPos[3].x} y={lifeBarsPos[3].y}/>}
+					{health > 1/5 + d && <Sprite texture={Textures.LifeBar.get("LifeBar_04")} anchor={0.5} x={lifeBarsPos[4].x} y={lifeBarsPos[4].y}/>}
+					{health > d && <Sprite texture={Textures.LifeBar.get("LifeBar_05")} anchor={0.5} x={lifeBarsPos[5].x} y={lifeBarsPos[5].y}/>}
+				</Sprite>
+			)}
 		</>
 	);
 };

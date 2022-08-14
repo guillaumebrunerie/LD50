@@ -106,5 +106,7 @@ export const useBeaver = ({isGameOver, tree, chopTree}) => {
 		}
 	}
 
-	return {beaver, scareBeaver};
+	const treeHealth = (beaver.state === "chopping") ? beaver.timeout / choppingTime : 1;
+
+	return {beaver, scareBeaver, treeHealth};
 }

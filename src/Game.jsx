@@ -46,11 +46,17 @@ const Game = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 		setAngle,
 		setSpeed,
 		limitAngle,
-	} = useTree({isGameOver, gameOver, scareAllBirds: (...args) => scareAllBirds(...args), currentWeight});
+	} = useTree({
+		isGameOver,
+		gameOver,
+		scareAllBirds: (...args) => scareAllBirds(...args),
+		currentWeight,
+	});
 
 	const {
 		beaver,
 		scareBeaver,
+		treeHealth,
 	} = useBeaver({isGameOver, tree, chopTree});
 
 	const {
@@ -98,7 +104,7 @@ const Game = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				<TrunkBack/>
 				<OwlBack owl={owl} onClick={owlTrigger}/>
 				<BearBack beeHive={beeHive}/>
-				<Trunk tree={tree}/>
+				<Trunk tree={tree} health={treeHealth}/>
 				<OwlFront owl={owl}/>
 				<BearFront beeHive={beeHive}/>
 				<BranchesAttached branches={branches} breakBranch={breakBranch}/>

@@ -4,8 +4,6 @@ TODO:
 - Beehive regrows (animation with bees reconstructing the beehive) (20 FPS)
 - Branches regrow (RegrowingTreeFx - 20 FPS)
 - Squirrels arrive and leave, and heal the tree if we click on it
-- 5 levels of tree
-- Owl calls woodpecker
 - Worm appears and when we click on it it goes to a bird that whistles and calls other birds
 - Fix size of bear images
 - At the last tree level, the beaver hits the tree with its tail
@@ -50,6 +48,8 @@ X Have the tree fall faster if there is no branch on one side
 X Preload sounds
 X Clicking owl when one side has no branches makes birds fly across the screen
 X Add music and mute button
+X 5 levels of tree
+X Owl calls woodpecker
 
 Graphical tasks
 ---------------
