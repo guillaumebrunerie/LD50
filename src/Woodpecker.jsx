@@ -1,10 +1,10 @@
 import * as React from "react";
-import {Animations} from "./Loader";
+import {Animations, Sounds} from "./Loader";
 import AnimatedSprite from "./components/AnimatedSprite";
 import useTicker from "./hooks/useTicker";
 
 // state: "hidden", "arriving", "knocking", "leaving"
-export const Woodpecker = ({woodpecker: {state, x, y, angle, flipped}}) => {
+export const Woodpecker = ({woodpecker: {state, x, y, angle, flipped}, onClick}) => {
 	let startAnim, loopAnim;
 	switch (state) {
 		case "hidden":
@@ -33,12 +33,13 @@ export const Woodpecker = ({woodpecker: {state, x, y, angle, flipped}}) => {
 			y={y}
 			angle={angle}
 			scale={[flipped, 1]}
+			interactive buttonMode pointerdown={onClick}
 		/>
 	)
 }
 
 const arrivingDuration = 700;
-const knockingDuration = 3000;
+const knockingDuration = 4000;
 const leavingDuration = 1000;
 
 const strength = 15; // Degrees per second
@@ -55,6 +56,9 @@ export const useWoodpecker = ({setSpeed, angle, setAngle}) => {
 
 	const callWoodpecker = () => {
 		if (state == "hidden") {
+			window.setTimeout(() => {
+				Sounds.WoodpeckerFlappingWings.play();
+			}, 200);
 			setTimeout(arrivingDuration);
 			setState("arriving");
 			const flipped = angle < 0 ? -1 : 1;
@@ -67,6 +71,15 @@ export const useWoodpecker = ({setSpeed, angle, setAngle}) => {
 				x: - flipped * 1500,
 				y: -500 - 1000 * Math.random(),
 			})
+		}
+	}
+
+	const scareWoodpecker = () => {
+		if (state == "knocking") {
+			Sounds.WoodpeckerKnocking.stop();
+			Sounds.WoodpeckerFlappingWings.play();
+			setTimeout(leavingDuration);
+			setState("leaving");
 		}
 	}
 
@@ -115,6 +128,9 @@ export const useWoodpecker = ({setSpeed, angle, setAngle}) => {
 				setY(onTreePos.y + t * (beforePos.y - onTreePos.y));
 				setWpAngle((1 - t) * angle);
 				if (timeout === 0) {
+					window.setTimeout(() => {
+						Sounds.WoodpeckerKnocking.play();
+					}, 200);
 					setState("knocking");
 					setTimeout(knockingDuration);
 				}
@@ -125,6 +141,8 @@ export const useWoodpecker = ({setSpeed, angle, setAngle}) => {
 				setY(onTreePos.y);
 				setWpAngle(angle);
 				if (timeout == 0) {
+					Sounds.WoodpeckerKnocking.stop();
+					Sounds.WoodpeckerFlappingWings.play();
 					setState("leaving");
 					setTimeout(leavingDuration);
 				}
@@ -148,5 +166,6 @@ export const useWoodpecker = ({setSpeed, angle, setAngle}) => {
 	return {
 		woodpecker: {state, x, y, flipped, angle: wpAngle},
 		callWoodpecker,
+		scareWoodpecker,
 	}
 }

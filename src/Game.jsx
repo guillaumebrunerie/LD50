@@ -75,6 +75,7 @@ const Game = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 	const {
 		woodpecker,
 		callWoodpecker,
+		scareWoodpecker,
 	} = useWoodpecker({setSpeed, angle, setAngle});
 
 	const {
@@ -112,7 +113,7 @@ const Game = ({x, y, isFirstScreen, isGameOver, gameOver}) => {
 				<Birds birds={birds} flipBird={flipBird} angle={angle}/>
 				<TreeFront/>
 			</Container>
-			<Woodpecker woodpecker={woodpecker}/>
+			<Woodpecker woodpecker={woodpecker} onClick={scareWoodpecker}/>
 			<BeeHiveDetached beeHive={beeHive}/>
 			<BranchesDetached branches={branches}/>
 			<WoodShavings beaver={beaver}/>

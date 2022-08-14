@@ -187,4 +187,11 @@ export const SoundData = {
 		highVolume: 0.4,
 		lowVolume: 0.15,
 	},
+	"WoodpeckerKnocking": {
+		volume: 0.5,
+		loop: true,
+	},
+	"WoodpeckerFlappingWings": {
+		volume: 3,
+	},
 }
