@@ -128,7 +128,7 @@ export const AnimationData = {
 		infix: "_0",
 		fps: 20,
 		start: 0,
-		end: 14,
+		end: 15,
 	},
 	"WoodpeckerKnockingLoop": {
 		infix: "_0",
@@ -140,13 +140,13 @@ export const AnimationData = {
 		infix: "_0",
 		fps: 30,
 		start: 0,
-		end: 10,
+		end: 5,
 	},
 	"WoodpeckerLand": {
 		infix: "_0",
 		fps: 30,
 		start: 0,
-		end: 13,
+		end: 8,
 	},
 }
 
